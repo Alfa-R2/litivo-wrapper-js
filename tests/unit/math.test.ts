@@ -1,4 +1,4 @@
-import { isEven, sum } from '../src/litivo/math.js';
+import { isEven, sum } from '../../src/litivo/math.js';
 import { describe, expect, it } from 'vitest';
 
 /**
