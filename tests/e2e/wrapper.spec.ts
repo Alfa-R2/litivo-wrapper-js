@@ -1,8 +1,9 @@
-import { expect, test } from './fixtures/wrapper.fixture.js';
+import { insolvency } from './config/data.js';
+// NOTE: commented "import { expect, test } from './fixtures/wrapper.fixture.js';" because expect is not needed yet.
+import { test } from './fixtures/wrapper.fixture.js';
 
-/** Wrapper tests. */
 test.describe('Wrapper Tests', () => {
-  test('test wrapper', async ({ litivo }) => {
-    expect(await litivo.waitforTimeout(5_000)).toBeUndefined();
+  test('Test insolvency', async ({ litivo }) => {
+    await litivo.createInsolvency(insolvency);
   });
 });

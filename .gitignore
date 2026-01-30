@@ -1,9 +1,13 @@
 # Project specific ignores:
 
-# Playwright HTML report
+# Secrets folder - ignore all non JSON example files.
+secrets/*
+!secrets/*.example.json
+
+# Playwright HTML report.
 playwright-report/
 
-# Playwright test results
+# Playwright test results.
 test-results/ 
 
 
