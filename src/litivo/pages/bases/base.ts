@@ -1,15 +1,15 @@
 import type { Page } from 'playwright';
+import Paged from './paged.js';
 
-export abstract class BasePage {
-  protected abstract readonly url: URL;
-
-  public constructor(protected readonly page: Page) {}
+abstract class BasePage extends Paged {
+  protected abstract readonly url: URL; // TODO: check if can be optimized by using base url and endpoints to avoid initialization of new URL objects. Check project constants URL as well.
 
   /** Navigate to the page's URL if not already there. */
   public async goto(url: URL = this.url): Promise<void> {
     const page: Page = this.page;
     const href: string = url.href;
-    if (page.url() !== href) {
+    const pageUrl: string = page.url();
+    if (pageUrl !== href) {
       await page.goto(href);
     }
     await page.waitForURL(href);
@@ -30,3 +30,5 @@ export abstract class BasePage {
     return this.page.waitForTimeout(timeout);
   }
 }
+
+export default BasePage;

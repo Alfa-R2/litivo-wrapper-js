@@ -1,14 +1,15 @@
 import type { Page } from '@playwright/test';
 
-import { Header } from '../components/header.js';
-import { SideBar } from '../components/sideBar.js';
-import { FootedPage } from './footed.js';
+import Header from '../components/header.js';
+import SideBar from '../components/sideBar.js';
+import FootedPage from './footed.js';
 
 /**
  * Base class for all pages that require a logged-in session.
+ *
  * Provides a reusable Header component with logout functionality.
  */
-export abstract class AuthenticatedPage extends FootedPage {
+abstract class AuthenticatedPage extends FootedPage {
   public readonly header: Header;
   public readonly sideBar: SideBar;
 
@@ -23,3 +24,5 @@ export abstract class AuthenticatedPage extends FootedPage {
     await this.header.logout();
   }
 }
+
+export default AuthenticatedPage;

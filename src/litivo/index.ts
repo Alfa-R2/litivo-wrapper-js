@@ -1,3 +1,3 @@
-import { Litivo } from './wrapper.js';
+import Litivo from './wrapper.js';
 
-export { Litivo };
+export default Litivo;

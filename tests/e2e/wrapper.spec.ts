@@ -5,5 +5,6 @@ import { test } from './fixtures/wrapper.fixture.js';
 test.describe('Wrapper Tests', () => {
   test('Test insolvency', async ({ litivo }) => {
     await litivo.createInsolvency(insolvency);
+    await litivo.waitforTimeout(500); // Breakpoint line();
   });
 });

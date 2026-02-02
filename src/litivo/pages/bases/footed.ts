@@ -1,8 +1,8 @@
 import type { Page } from 'playwright';
-import { Footer } from '../components/footer.js';
-import { BasePage } from './base.js';
+import Footer from '../components/footer.js';
+import BasePage from './base.js';
 
-export abstract class FootedPage extends BasePage {
+abstract class FootedPage extends BasePage {
   public readonly footer: Footer;
 
   public constructor(page: Page) {
@@ -10,3 +10,5 @@ export abstract class FootedPage extends BasePage {
     this.footer = new Footer(page);
   }
 }
+
+export default FootedPage;

@@ -1,6 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
 
-export class Header {
+class Header {
   public readonly appPerfil: Locator;
   public readonly logoutButton: Locator;
 
@@ -17,3 +17,5 @@ export class Header {
     await page.waitForURL((newUrl) => newUrl.href !== page.url()); // TODO: Consider refactoring into an interface method.
   }
 }
+
+export default Header;
