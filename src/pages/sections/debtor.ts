@@ -22,8 +22,8 @@ class DebtorSection extends BaseSection<[DebtorType[]]> {
   private readonly lastNameInput: Locator;
   private readonly secondLastNameInput: Locator;
   private readonly addIdDocFileButton: Locator;
-  private readonly idIdDocFileInput: Locator;
-  private readonly uploadIdDocFileButton: Locator;
+  private readonly fileInput: Locator;
+  private readonly uploadFileButton: Locator;
   private readonly genderInput: Locator;
   private readonly civilStatusInput: Locator;
   private readonly birthDateInput: Locator;
@@ -52,8 +52,8 @@ class DebtorSection extends BaseSection<[DebtorType[]]> {
     this.lastNameInput = page.locator('input[formcontrolname="apellido1"]');
     this.secondLastNameInput = page.locator('input[formcontrolname="apellido2"]');
     this.addIdDocFileButton = page.locator('span', { hasText: 'ANEXAR COPIA DE LA CÉDULA' }); // TODO: Find a better way to get the locator.
-    this.idIdDocFileInput = page.locator('input[type="file"]#undefined');
-    this.uploadIdDocFileButton = page.locator('button:not([disabled])', { hasText: 'Subir' }); // TODO: Find a better way to get the locator.
+    this.fileInput = page.locator('input[type="file"]#undefined');
+    this.uploadFileButton = page.locator('button:not([disabled])', { hasText: 'Subir' }); // TODO: Find a better way to get the locator.
     this.genderInput = page.locator(getInputSelector('genero'));
     this.civilStatusInput = page.locator(getInputSelector('estadoCivil'));
     this.birthDateInput = page.locator(getDateInputSelector('fechaNacimiento'));
@@ -108,7 +108,29 @@ class DebtorSection extends BaseSection<[DebtorType[]]> {
       const emailsOrReason: string | string[] = debtor.emailsOrReason;
       const webPages: string[] = debtor.webPages || [];
 
+      // NOTE: Other consts may be refactored here.
+
+      const incomeInput = page.locator('input[formcontrolname="montoIngresosMensuales"]');
+      const hasMonthlyIncomeButton: Locator = page.locator(
+        'label[formcontrolname="poseeIngresosMensuales"]',
+      );
+      const totalMonthlyIncomeFromOtherActivities: number =
+        debtor.totalMonthlyIncomeFromOtherActivities || 0;
+      const hasOtherActivitiesIncomeButton = page.locator(
+        'label[formcontrolname="swOtraActividad"]',
+      );
+      const otherActivitiesIncomeInput: Locator = page.locator(
+        'input[formcontrolname="montoIngresoOtraActividad"]',
+      );
+      const totalMonthlyIncomeFromOtherActivitiesDescription: string =
+        debtor.totalMonthlyIncomeFromOtherActivitiesDescription || '';
+      const otherActivitiesIncomeTextarea: Locator = page.locator(
+        'textarea[formcontrolname="descripcionOtraActividad"]',
+      );
+
       await this.addDebtorButton.click();
+
+      // Identification data
 
       await this.selectOption(this.idTypeInput, docType);
       await this.idNumberInput.fill(docNumber);
@@ -127,8 +149,8 @@ class DebtorSection extends BaseSection<[DebtorType[]]> {
       }
 
       await this.addIdDocFileButton.click();
-      await this.idIdDocFileInput.setInputFiles(docFilePath);
-      await this.uploadIdDocFileButton.click();
+      await this.fileInput.setInputFiles(docFilePath);
+      await this.uploadFileButton.click();
 
       await this.selectOption(this.genderInput, debtor.gender);
       if (civilStatus !== undefined) {
@@ -141,6 +163,9 @@ class DebtorSection extends BaseSection<[DebtorType[]]> {
       if (disability !== undefined) {
         await this.selectDescriptedOption(this.disabilityInput, disability);
       }
+
+      // Contact information
+
       const residenceCountryInputValue = await this.residenceCountryInput.innerText();
       if (residenceCountryInputValue !== residenceCountry) {
         await this.fillInput(this.residenceCountryInput, residenceCountry);
@@ -230,40 +255,54 @@ class DebtorSection extends BaseSection<[DebtorType[]]> {
       });
       await hasProceduresLabel.click();
 
-      // TODO: Fill up to 3 telephone numbers.
-      // TODO: Fill up to 3 cellphone numbers.
+      // Employment data
 
-      throw new Error('Method not fully implemented.');
+      const hasEmployment: boolean = debtor.economicActivity.includes('Empleo ');
+      const economicActivity: string = debtor.economicActivity.replace('Empleo ', '');
 
-      // breakpoint
+      if (hasEmployment) {
+        const hasEmploymentButton = page.locator('label[formcontrolname="tieneEmpleo"]');
+        await hasEmploymentButton.click();
+      }
+      const activityPart = hasEmployment ? 'Empleo' : 'Actividad';
+      const ActivityTypeInput = page.locator(getInputSelector(`tipo${activityPart}`));
+      await this.selectOption(ActivityTypeInput, economicActivity);
 
-      await page.waitForTimeout(1000);
+      const activityDescriptionTextarea = page.locator('textarea[formcontrolname="descripcion"]');
+      await activityDescriptionTextarea.fill(debtor.economicActivityDescription);
 
-      /** 
-      // Legal procedures
-      if (typeof debtor.hasCollectionProcedures === 'boolean') {
-        const radioLabel = page.locator(
-          'nz-radio-group[formcontrolname="tiene_procedimientos"] label',
-          {
-            hasText: debtor.hasCollectionProcedures ? 'Si' : 'No',
-          },
-        );
-        if (await radioLabel.count()) await radioLabel.click();
+      const totalMonthlyIncome = debtor.totalMonthlyIncome || 0;
+      if (totalMonthlyIncome > 0) {
+        await incomeInput.fill(totalMonthlyIncome.toString());
+        const addEmploymentOrIncomeCertificationButton = page.locator('button', {
+          hasText: 'ANEXAR CERTIFICACIÓN LABORAL O DE INGRESOS',
+        });
+        await addEmploymentOrIncomeCertificationButton.click();
+        const employmentOrIncomeCertificationFilePath =
+          debtor.employmentOrIncomeCertificationFilePath || '';
+        if (employmentOrIncomeCertificationFilePath === '') {
+          throw new Error(
+            'employmentOrIncomeCertificationFilePath is Mandatory when totalMonthlyIncome > 0.',
+          );
+        }
+        await this.fileInput.setInputFiles(employmentOrIncomeCertificationFilePath);
+        await this.uploadFileButton.click();
+      } else {
+        await hasMonthlyIncomeButton.click();
       }
 
-      // Employment
-      if (typeof debtor.hasEmployment === 'boolean') {
-        const empleoLabel = page.locator(
-          'label[formcontrolname="tieneEmpleo"] input[type="checkbox"]',
-        );
-        const checked = await empleoLabel.isChecked().catch(() => false);
-        if (debtor.hasEmployment !== checked) await empleoLabel.click();
+      if (totalMonthlyIncomeFromOtherActivities > 0) {
+        await hasOtherActivitiesIncomeButton.click();
+        await otherActivitiesIncomeInput.fill(totalMonthlyIncomeFromOtherActivities.toString());
+        if (totalMonthlyIncomeFromOtherActivitiesDescription === '') {
+          throw new Error(
+            'totalMonthlyIncomeFromOtherActivitiesDescription is Mandatory when totalMonthlyIncomeFromOtherActivities > 0.',
+          );
+        }
+        await otherActivitiesIncomeTextarea.fill(totalMonthlyIncomeFromOtherActivitiesDescription);
       }
 
-      // Give a small pause to let UI react
-      await page.waitForTimeout(300);
-
-      */
+      await page.waitForTimeout(1000); // breakpoint  // throw new Error('Method not fully implemented.');
     }
   }
 }

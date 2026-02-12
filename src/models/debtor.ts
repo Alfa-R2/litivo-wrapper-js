@@ -3,6 +3,8 @@ import { IdDocSchema, type IdDocType } from './identification-document.js';
 
 const PhoneSchema = z.string().min(1, 'Phone number is required');
 
+// TODO: Create a debtor class to contain custom debtor logic.
+
 const DebtorSchema = z.object({
   // === Identification Data === // NOTE: from originCountry to birthDate may be part of the idDoc as well.
   idDoc: IdDocSchema,
@@ -40,30 +42,27 @@ const DebtorSchema = z.object({
   isMerchant: z.boolean(),
   hasMultipleDebtCollectionProcedures: z.boolean(), // ¿En contra de usted se han iniciado dos (2) o más procedimientos públicos o privados de cobro de obligaciones dinerarias, de ejecución especial o de restitución de bienes por mora en el pago de cánones?
 
-  /** TODO: Check if the next IA generated fields are ok
+  // Employment Data
+  economicActivity: z.string().trim().min(11), // TODO: "Empleo Formal", "Empleo Informal", "Trabajador Independiente", "Desempleado".
+  economicActivityDescription: z.string().trim().min(1),
 
-  // === Professional information ===  (array of them)
-  professionalLicenseNumber: z.string().optional(),
-  degreeIssuingEntity: z.string().optional(),
-  graduationDate: z.string().optional(), // ISO date (yyyy-mm-dd)
+  totalMonthlyIncome: z.number().nonnegative().optional(), // Employment income in COP
+  employmentOrIncomeCertificationFilePath: z.string().min(1).optional(),
 
-  // === Address ===
-  businessName: z.string().optional(),
+  totalMonthlyIncomeFromOtherActivities: z.number().nonnegative().optional(), // Other activities income in COP
+  totalMonthlyIncomeFromOtherActivitiesDescription: z.string().trim().min(1).optional(), // TODO: Mandatory if totalMonthlyIncomeFromOtherActivities is truthy.
 
-  // === Income information ===
-  hasMonthlyIncome: z.boolean(),
-  monthlyIncomeAmount: z.number().optional(),
+  // Marital or Patrimonial Partnership:
 
-  hasOtherActivitiesIncome: z.boolean(),
+  // TODO
 
-  // === Legal procedures ===
-  hasCollectionProcedures: z.boolean(),
+  // Study Data
 
-  // Employment
-  hasEmployment: z.boolean().optional(),
+  // TODO
 
+  // Profession Details
 
-  */
+  // TODO
 });
 
 type DebtorType = z.infer<typeof DebtorSchema>;
