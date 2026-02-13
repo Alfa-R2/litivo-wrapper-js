@@ -2,7 +2,8 @@ import { z } from 'zod';
 import { CausesSchema } from './causes.js';
 
 import { CreditorJuridicaSchema, CreditorNaturalSchema } from './creditor.js';
-import { DebtorSchema, IdDocSchema, type DebtorType, type IdDocType } from './debtor.js';
+import type { DebtorType, ExIdDocType, ProfessionType } from './debtor.js';
+import { DebtorSchema, ExIdDocSchema, ProfessionSchema } from './debtor.js';
 import { SiteSchema, type SiteType } from './site.js';
 
 // TODO: Add progressively the needed validations.
@@ -24,6 +25,6 @@ const InsolvencySchema = z.object({
 
 type InsolvencyType = z.infer<typeof InsolvencySchema>;
 
-export { DebtorSchema, IdDocSchema, InsolvencySchema, SiteSchema };
-export type { DebtorType, IdDocType, InsolvencyType, SiteType };
+export { DebtorSchema, ExIdDocSchema, InsolvencySchema, ProfessionSchema, SiteSchema };
+export type { DebtorType, ExIdDocType, InsolvencyType, ProfessionType, SiteType };
 

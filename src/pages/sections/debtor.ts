@@ -1,14 +1,16 @@
 import type { Locator, Page } from 'playwright';
 import { getDateInputSelector, getInputSelector } from '../../helpers.js';
-import type { DebtorType, IdDocType } from '../../models/debtor.js';
+import type { DebtorType, ExIdDocType, ProfessionType } from '../../models/debtor.js';
+import type { IdDocType, SpouseType } from '../../models/spouse.js';
 import BaseSection from '../bases/section.js';
 
 const plusSpanSelector: string = '+ span.ant-input-suffix';
 
 /**
- * TODO: Debtor (feat: extend create insolvency method with debtor section)
  * TODO: check the next BUSINESS LOGIC: Debtors can have just one insolvency application at a time.
  * TODO: Check if it is possible to used a tuple instead of an array.
+ * NOTE: Once a debtor in linked, page will always remember the debtor. If you want to modify their info, you'll need to work over it.
+ * TODO: Eliminate any saved draft when a new debtor is already added because cannot use an already used debtor.
  */
 class DebtorSection extends BaseSection<[DebtorType[]]> {
   private readonly addDebtorButton: Locator;
@@ -73,7 +75,7 @@ class DebtorSection extends BaseSection<[DebtorType[]]> {
     const page = this.page;
 
     for (const debtor of debtors) {
-      const idDoc: IdDocType = debtor.idDoc;
+      const idDoc: ExIdDocType = debtor.idDoc;
       const docType: string = idDoc.type;
       const docNumber: string = idDoc.number;
       const docFilePath: string = idDoc.filePath;
@@ -130,7 +132,7 @@ class DebtorSection extends BaseSection<[DebtorType[]]> {
 
       await this.addDebtorButton.click();
 
-      // Identification data
+      // Identification Data
 
       await this.selectOption(this.idTypeInput, docType);
       await this.idNumberInput.fill(docNumber);
@@ -146,6 +148,13 @@ class DebtorSection extends BaseSection<[DebtorType[]]> {
       await this.lastNameInput.fill(debtor.lastName);
       if (secondLastName !== '') {
         await this.secondLastNameInput.fill(secondLastName);
+      }
+
+      // NOTE: Delete all previous uploaded things, like docs or certain info with delete buttons.
+      // NOTE: This is because once debtor is linked, page will always remember the debtor.
+      const deleteButtons = await page.locator('i[nztype="delete"]').all();
+      for (const deleteButton of deleteButtons) {
+        await deleteButton.click();
       }
 
       await this.addIdDocFileButton.click();
@@ -164,7 +173,7 @@ class DebtorSection extends BaseSection<[DebtorType[]]> {
         await this.selectDescriptedOption(this.disabilityInput, disability);
       }
 
-      // Contact information
+      // Contact Information
 
       const residenceCountryInputValue = await this.residenceCountryInput.innerText();
       if (residenceCountryInputValue !== residenceCountry) {
@@ -227,9 +236,12 @@ class DebtorSection extends BaseSection<[DebtorType[]]> {
       } else {
         // value is string
         const unknownEmailButton: Locator = page.locator('label[formcontrolname="conoceEmail"]');
-        await unknownEmailButton.click();
-        const textareaReason = page.locator('textarea[formcontrolname="razonDesconoceEmail"]');
-        await textareaReason.fill(emailsOrReason);
+        const reasonIsChecked: boolean = await unknownEmailButton.locator('input').isChecked();
+        if (!reasonIsChecked) {
+          await unknownEmailButton.click();
+          const textareaReason = page.locator('textarea[formcontrolname="razonDesconoceEmail"]');
+          await textareaReason.fill(emailsOrReason);
+        }
       }
       let webPageIndex: number = 0;
       for (const webPage of webPages) {
@@ -245,7 +257,10 @@ class DebtorSection extends BaseSection<[DebtorType[]]> {
       const merchantNzFormItem: Locator = page.locator('nz-form-item', { hasText: merchantNzText });
       const merchantText: string = `${debtor.isMerchant ? '' : 'NO '}Comerciante`;
       const merchantRadio: Locator = merchantNzFormItem.locator('label', { hasText: merchantText });
-      await merchantRadio.click();
+      const merchantRadioIsChecked: boolean = await merchantRadio.isChecked();
+      if (!merchantRadioIsChecked) {
+        await merchantRadio.click();
+      }
 
       const hasProceduresNzRadioGroup: Locator = page.locator(
         'nz-radio-group[formcontrolname="tiene_procedimientos"]',
@@ -255,14 +270,17 @@ class DebtorSection extends BaseSection<[DebtorType[]]> {
       });
       await hasProceduresLabel.click();
 
-      // Employment data
+      // Employment Data
 
       const hasEmployment: boolean = debtor.economicActivity.includes('Empleo ');
       const economicActivity: string = debtor.economicActivity.replace('Empleo ', '');
 
       if (hasEmployment) {
         const hasEmploymentButton = page.locator('label[formcontrolname="tieneEmpleo"]');
-        await hasEmploymentButton.click();
+        const hasEmploymentButtonIsChecked: boolean = await hasEmploymentButton.isChecked();
+        if (!hasEmploymentButtonIsChecked) {
+          await hasEmploymentButton.click();
+        }
       }
       const activityPart = hasEmployment ? 'Empleo' : 'Actividad';
       const ActivityTypeInput = page.locator(getInputSelector(`tipo${activityPart}`));
@@ -288,11 +306,20 @@ class DebtorSection extends BaseSection<[DebtorType[]]> {
         await this.fileInput.setInputFiles(employmentOrIncomeCertificationFilePath);
         await this.uploadFileButton.click();
       } else {
-        await hasMonthlyIncomeButton.click();
+        const hasMonthlyIncomeButtonIsChecked: boolean = await hasMonthlyIncomeButton
+          .locator('input')
+          .isChecked();
+        if (!hasMonthlyIncomeButtonIsChecked) {
+          await hasMonthlyIncomeButton.click();
+        }
       }
 
       if (totalMonthlyIncomeFromOtherActivities > 0) {
-        await hasOtherActivitiesIncomeButton.click();
+        const hasOtherActivitiesIncomeButtonIsChecked: boolean =
+          await hasOtherActivitiesIncomeButton.locator('input').isChecked();
+        if (!hasOtherActivitiesIncomeButtonIsChecked) {
+          await hasOtherActivitiesIncomeButton.click();
+        }
         await otherActivitiesIncomeInput.fill(totalMonthlyIncomeFromOtherActivities.toString());
         if (totalMonthlyIncomeFromOtherActivitiesDescription === '') {
           throw new Error(
@@ -302,8 +329,150 @@ class DebtorSection extends BaseSection<[DebtorType[]]> {
         await otherActivitiesIncomeTextarea.fill(totalMonthlyIncomeFromOtherActivitiesDescription);
       }
 
-      await page.waitForTimeout(1000); // breakpoint  // throw new Error('Method not fully implemented.');
+      // Marital or Patrimonial Partnership:
+
+      const hadPartnershipButton = page.locator(
+        'label[formcontrolname="tieneSociedadPatrimonial"]',
+      );
+      const hasSpouseButton = page.locator('label[formcontrolname="tieneConyugue"]');
+
+      const spouse: SpouseType | undefined = debtor.spouse;
+      const publicDeedOrJudgmentFilePath: string | undefined = debtor.publicDeedOrJudgmentFilePath;
+      const assetsListFilePath: string | undefined = debtor.assetsListFilePath;
+      const hadMaritalOrPatrimonialPartnership: boolean =
+        spouse !== undefined ||
+        publicDeedOrJudgmentFilePath !== undefined ||
+        assetsListFilePath !== undefined;
+
+      if (hadMaritalOrPatrimonialPartnership) {
+        const hadPartnershipButtonIsChecked: boolean = await hadPartnershipButton
+          .locator('input')
+          .isChecked();
+        if (!hadPartnershipButtonIsChecked) {
+          await hadPartnershipButton.click();
+        }
+        if (spouse !== undefined) {
+          const hasSpouseButtonIsChecked: boolean = await hasSpouseButton
+            .locator('input')
+            .isChecked();
+          if (!hasSpouseButtonIsChecked) {
+            await hasSpouseButton.click();
+          }
+
+          const spouseIdDoc: IdDocType = spouse.idDoc;
+          const spouseIdTypeInput = page.locator(getInputSelector('conyugueTipoIdentificacion'));
+          const spouseIdNumberInput = page.locator(
+            'input[formcontrolname="conyugueIdentificacion"]',
+          );
+          const spouseFirstNameInput = page.locator('input[formcontrolname="conyugueNombre1"]');
+          const spouseMiddleNameInput = page.locator('input[formcontrolname="conyugueNombre2"]');
+          const spouseLastNameInput = page.locator('input[formcontrolname="conyugueApellido1"]');
+          const spouseSecondLastNameInput = page.locator(
+            'input[formcontrolname="conyugueApellido2"]',
+          );
+          const spouseMiddleName: string = spouse.middleName || '';
+          const spouseSecondLastName: string = spouse.secondLastName || '';
+
+          await this.selectOption(spouseIdTypeInput, spouseIdDoc.type);
+          await spouseIdNumberInput.fill(spouseIdDoc.number);
+
+          await spouseFirstNameInput.fill(spouse.firstName);
+          if (spouseMiddleName !== '') {
+            await spouseMiddleNameInput.fill(spouseMiddleName);
+          }
+          await spouseLastNameInput.fill(spouse.lastName);
+          if (spouseSecondLastName !== '') {
+            await spouseSecondLastNameInput.fill(spouseSecondLastName);
+          }
+
+          const addSpouseIdDocButton = page.locator('button', {
+            hasText: 'ANEXAR DOCUMENTO DE IDENTIDAD DEL CÓNYUGE',
+          });
+
+          await addSpouseIdDocButton.click();
+          await this.fileInput.setInputFiles(spouse.idDoc.filePath);
+          await this.uploadFileButton.click();
+        } else if (publicDeedOrJudgmentFilePath !== undefined || assetsListFilePath !== undefined) {
+          // sociedadLiquidada
+          const partnershipEndedButton = page.locator('label[formcontrolname="sociedadLiquidada"]');
+          const endedWithinLastTwoYearsButton = page.locator(
+            'label[formcontrolname="fechaLiquidacion"]',
+          );
+          const hasPartnershipEndedButtonIsChecked: boolean = await partnershipEndedButton
+            .locator('input')
+            .isChecked();
+          if (!hasPartnershipEndedButtonIsChecked) {
+            await partnershipEndedButton.click();
+          }
+          const hasEndedWithinLastTwoYearsButtonIsChecked: boolean =
+            await endedWithinLastTwoYearsButton.locator('input').isChecked();
+          if (!hasEndedWithinLastTwoYearsButtonIsChecked) {
+            await endedWithinLastTwoYearsButton.click();
+          }
+          if (publicDeedOrJudgmentFilePath !== undefined) {
+            const addPublicDeedOrJudgmentButton = page.locator('button', {
+              hasText: 'ANEXAR ESCRITURA PÚBLICA O SENTENCIA',
+            });
+            await addPublicDeedOrJudgmentButton.click();
+            await this.fileInput.setInputFiles(publicDeedOrJudgmentFilePath);
+            await this.uploadFileButton.click();
+          }
+          if (assetsListFilePath !== undefined) {
+            const addAssetsListButton = page.locator('button', {
+              hasText: 'ANEXAR COPIA DE LA RELACIÓN DE BIENES',
+            });
+            await addAssetsListButton.click();
+            await this.fileInput.setInputFiles(assetsListFilePath);
+            await this.uploadFileButton.click();
+          }
+        }
+      }
+
+      // Study Data
+
+      const schoolLevelInput: Locator = page.locator(getInputSelector('nivelEscolar'));
+      await this.selectOption(schoolLevelInput, debtor.schoolLevel);
+
+      // Profession Details
+
+      const professionNameInput: Locator = page.locator(getInputSelector('nombreProfesion'));
+      const institutionInput: Locator = page.locator(getInputSelector('institucion'));
+      const professionalCardNumberInput: Locator = page.locator(
+        'input[formcontrolname="tarjetaProfesional"]',
+      );
+      const degreeIssuingEntityInput: Locator = page.locator(
+        'input[formcontrolname="entidadEmisoraTitulo"]',
+      );
+      const graduationDateInput: Locator = page.locator(getDateInputSelector('fechaGraduacion'));
+      const addProfessionButton: Locator = page.locator('button', {
+        hasText: 'AGREGAR PROFESIÓN',
+      });
+      const professions: ProfessionType[] = debtor.professions || [];
+
+      for (const profession of professions) {
+        await this.fillInput(professionNameInput, profession.name);
+        await this.fillInput(institutionInput, profession.institution);
+        await professionalCardNumberInput.fill(profession.professionalCardNumber.toString());
+        await degreeIssuingEntityInput.fill(profession.degreeIssuingEntity);
+        await this.fillDateInput(graduationDateInput, profession.graduationDate);
+        await addProfessionButton.click();
+        await page.waitForTimeout(500); // TODO: find a better way to wait for profession to be added.
+      }
+
+      const linkButton: Locator = page.locator('button', { hasText: 'Vincular' });
+      await linkButton.click();
+      await graduationDateInput.waitFor({ state: 'detached' });
+
+      // TODO: Select postulant (when more than one debtor is in the application)
+      // NOTE: Idk which one is the selected one when there is more than one debtor in the application.
+      // NOTE: I suggest to select the first debtor of the array.
+
+      // TODO: Add an option to add representatives to debtors
     }
+    const nextButton = page.locator('button', { hasText: 'Siguiente' }); // TODO: Find a better way to get the locator.
+    await nextButton.click();
+
+    await this.addDebtorButton.waitFor({ state: 'detached' });
   }
 }
 
