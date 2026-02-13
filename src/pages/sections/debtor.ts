@@ -10,6 +10,7 @@ const plusSpanSelector: string = '+ span.ant-input-suffix';
  * TODO: check the next BUSINESS LOGIC: Debtors can have just one insolvency application at a time.
  * TODO: Check if it is possible to used a tuple instead of an array.
  * NOTE: Once a debtor in linked, page will always remember the debtor. If you want to modify their info, you'll need to work over it.
+ * TODO: Eliminate any saved draft when a new debtor is already added because cannot use an already used debtor.
  */
 class DebtorSection extends BaseSection<[DebtorType[]]> {
   private readonly addDebtorButton: Locator;
@@ -235,9 +236,12 @@ class DebtorSection extends BaseSection<[DebtorType[]]> {
       } else {
         // value is string
         const unknownEmailButton: Locator = page.locator('label[formcontrolname="conoceEmail"]');
-        await unknownEmailButton.click();
-        const textareaReason = page.locator('textarea[formcontrolname="razonDesconoceEmail"]');
-        await textareaReason.fill(emailsOrReason);
+        const reasonIsChecked: boolean = await unknownEmailButton.locator('input').isChecked();
+        if (!reasonIsChecked) {
+          await unknownEmailButton.click();
+          const textareaReason = page.locator('textarea[formcontrolname="razonDesconoceEmail"]');
+          await textareaReason.fill(emailsOrReason);
+        }
       }
       let webPageIndex: number = 0;
       for (const webPage of webPages) {
@@ -253,7 +257,10 @@ class DebtorSection extends BaseSection<[DebtorType[]]> {
       const merchantNzFormItem: Locator = page.locator('nz-form-item', { hasText: merchantNzText });
       const merchantText: string = `${debtor.isMerchant ? '' : 'NO '}Comerciante`;
       const merchantRadio: Locator = merchantNzFormItem.locator('label', { hasText: merchantText });
-      await merchantRadio.click();
+      const merchantRadioIsChecked: boolean = await merchantRadio.isChecked();
+      if (!merchantRadioIsChecked) {
+        await merchantRadio.click();
+      }
 
       const hasProceduresNzRadioGroup: Locator = page.locator(
         'nz-radio-group[formcontrolname="tiene_procedimientos"]',
@@ -270,7 +277,10 @@ class DebtorSection extends BaseSection<[DebtorType[]]> {
 
       if (hasEmployment) {
         const hasEmploymentButton = page.locator('label[formcontrolname="tieneEmpleo"]');
-        await hasEmploymentButton.click();
+        const hasEmploymentButtonIsChecked: boolean = await hasEmploymentButton.isChecked();
+        if (!hasEmploymentButtonIsChecked) {
+          await hasEmploymentButton.click();
+        }
       }
       const activityPart = hasEmployment ? 'Empleo' : 'Actividad';
       const ActivityTypeInput = page.locator(getInputSelector(`tipo${activityPart}`));
@@ -296,11 +306,20 @@ class DebtorSection extends BaseSection<[DebtorType[]]> {
         await this.fileInput.setInputFiles(employmentOrIncomeCertificationFilePath);
         await this.uploadFileButton.click();
       } else {
-        await hasMonthlyIncomeButton.click();
+        const hasMonthlyIncomeButtonIsChecked: boolean = await hasMonthlyIncomeButton
+          .locator('input')
+          .isChecked();
+        if (!hasMonthlyIncomeButtonIsChecked) {
+          await hasMonthlyIncomeButton.click();
+        }
       }
 
       if (totalMonthlyIncomeFromOtherActivities > 0) {
-        await hasOtherActivitiesIncomeButton.click();
+        const hasOtherActivitiesIncomeButtonIsChecked: boolean =
+          await hasOtherActivitiesIncomeButton.locator('input').isChecked();
+        if (!hasOtherActivitiesIncomeButtonIsChecked) {
+          await hasOtherActivitiesIncomeButton.click();
+        }
         await otherActivitiesIncomeInput.fill(totalMonthlyIncomeFromOtherActivities.toString());
         if (totalMonthlyIncomeFromOtherActivitiesDescription === '') {
           throw new Error(
@@ -326,9 +345,19 @@ class DebtorSection extends BaseSection<[DebtorType[]]> {
         assetsListFilePath !== undefined;
 
       if (hadMaritalOrPatrimonialPartnership) {
-        await hadPartnershipButton.click();
+        const hadPartnershipButtonIsChecked: boolean = await hadPartnershipButton
+          .locator('input')
+          .isChecked();
+        if (!hadPartnershipButtonIsChecked) {
+          await hadPartnershipButton.click();
+        }
         if (spouse !== undefined) {
-          await hasSpouseButton.click();
+          const hasSpouseButtonIsChecked: boolean = await hasSpouseButton
+            .locator('input')
+            .isChecked();
+          if (!hasSpouseButtonIsChecked) {
+            await hasSpouseButton.click();
+          }
 
           const spouseIdDoc: IdDocType = spouse.idDoc;
           const spouseIdTypeInput = page.locator(getInputSelector('conyugueTipoIdentificacion'));
@@ -369,9 +398,17 @@ class DebtorSection extends BaseSection<[DebtorType[]]> {
           const endedWithinLastTwoYearsButton = page.locator(
             'label[formcontrolname="fechaLiquidacion"]',
           );
-          await partnershipEndedButton.click();
-          await endedWithinLastTwoYearsButton.click();
-
+          const hasPartnershipEndedButtonIsChecked: boolean = await partnershipEndedButton
+            .locator('input')
+            .isChecked();
+          if (!hasPartnershipEndedButtonIsChecked) {
+            await partnershipEndedButton.click();
+          }
+          const hasEndedWithinLastTwoYearsButtonIsChecked: boolean =
+            await endedWithinLastTwoYearsButton.locator('input').isChecked();
+          if (!hasEndedWithinLastTwoYearsButtonIsChecked) {
+            await endedWithinLastTwoYearsButton.click();
+          }
           if (publicDeedOrJudgmentFilePath !== undefined) {
             const addPublicDeedOrJudgmentButton = page.locator('button', {
               hasText: 'ANEXAR ESCRITURA PÚBLICA O SENTENCIA',
@@ -435,7 +472,7 @@ class DebtorSection extends BaseSection<[DebtorType[]]> {
     const nextButton = page.locator('button', { hasText: 'Siguiente' }); // TODO: Find a better way to get the locator.
     await nextButton.click();
 
-    await page.waitForTimeout(500);
+    await this.addDebtorButton.waitFor({ state: 'detached' });
   }
 }
 

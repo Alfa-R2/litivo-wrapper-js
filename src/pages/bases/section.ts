@@ -5,6 +5,8 @@ import Paged from './paged.js';
 
 const isoDateSchema = z.iso.date();
 
+// TODO: Do not fill if already selected
+
 abstract class BaseSection<T extends unknown[]> extends Paged {
   public constructor(page: Page) {
     super(page);
@@ -38,12 +40,14 @@ abstract class BaseSection<T extends unknown[]> extends Paged {
   }
 
   protected async selectOption(nzSelect: Locator, value: string): Promise<void> {
-    const input: Locator = nzSelect.locator('input');
-    await input.click();
+    await nzSelect.click();
     const optionDiv: Locator = this.getOptionDiv(value);
     await optionDiv.click();
   }
 
+  /**
+   * TODO: Do not fill if the value is already selected
+   */
   protected async selectDescriptedOption(input: Locator, value: string): Promise<void> {
     await input.click();
     const optionDiv: Locator = this.page.locator(strongOptionDivSelector, { hasText: value });
