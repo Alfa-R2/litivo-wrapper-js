@@ -1,5 +1,7 @@
 import { z } from 'zod';
-import { IdDocSchema, type IdDocType } from './identification-document.js';
+import { ExIdDocSchema, type ExIdDocType } from './identification-document.js';
+import { ProfessionSchema, type ProfessionType } from './profession.js';
+import { SpouseSchema } from './spouse.js';
 
 const PhoneSchema = z.string().min(1, 'Phone number is required');
 
@@ -7,7 +9,7 @@ const PhoneSchema = z.string().min(1, 'Phone number is required');
 
 const DebtorSchema = z.object({
   // === Identification Data === // NOTE: from originCountry to birthDate may be part of the idDoc as well.
-  idDoc: IdDocSchema,
+  idDoc: ExIdDocSchema,
   // NOTE: This info can be found in in a excel file with "Formato de Radicación" in its name.
   originCountry: z.string().trim().min(1),
   firstName: z.string().trim().min(1),
@@ -54,18 +56,27 @@ const DebtorSchema = z.object({
 
   // Marital or Patrimonial Partnership:
 
-  // TODO
+  spouse: SpouseSchema.optional(), // TODO: If set, publicDeedOrJudgmentFilePath and assetsListFilePath will be ignore.
+  // NOTE: Partnership Dissolved Within Last Two Years
+  // Copia de la escritura pública o de la sentencia por medio de la cual esta se haya liquidado, o de la sentencia que haya declarado la separación de bienes:
+  //  ANEXAR ESCRITURA PÚBLICA O SENTENCIA
+  publicDeedOrJudgmentFilePath: z.string().trim().min(1).optional(), // . TODO: Has to exist or has to be bytes. OR JUDGMENT.
+  // Relación de bienes con el valor comercial estimado que fueron objeto de entrega:
+  //  ANEXAR COPIA DE LA RELACIÓN DE BIENES
+  assetsListFilePath: z.string().trim().min(1).optional(), // TODO: Has to exist or has to be bytes.
 
   // Study Data
 
-  // TODO
+  schoolLevel: z.string().trim().min(10), // TODO: "DOCTORADO O EQUIVALENTE", "EDUCACIÓN BÁSICA PRIMARIA", "EDUCACIÓN BÁSICA SECUNDARIA O SECUNDARIA BAJA", "EDUCACIÓN DE LA PRIMERA INFANCIA", "EDUCACIÓN MEDIA O SECUNDARIA ALTA", "EDUCACIÓN POSTSECUNDARIA NO SUPERIOR", "EDUCACIÓN TÉCNICA PROFESIONAL Y TECNOLÓGICA", "ESPECIALIZACIÓN, MAESTRÍA O EQUIVALENTE", "NINGUNA", "NO INFORMA", "UNIVERSITARIO O EQUIVALENTE".
 
   // Profession Details
 
-  // TODO
+  professions: z.array(ProfessionSchema).optional(), // TODO: Check if there are a limit.
+
+  // TODO: Add representatives, an optional array of RepresentativeSchema.
 });
 
 type DebtorType = z.infer<typeof DebtorSchema>;
 
-export { DebtorSchema, IdDocSchema };
-export type { DebtorType, IdDocType };
+export { DebtorSchema, ExIdDocSchema, ProfessionSchema };
+export type { DebtorType, ExIdDocType, ProfessionType };
