@@ -8,11 +8,8 @@ importers:
 
   .:
     dependencies:
-      litivo-wrapper:
-        specifier: ^0.3.11
-        version: 0.3.11(playwright@1.58.2)
       playwright:
-        specifier: ^1.58.2
+        specifier: ^1.58.0
         version: 1.58.2
       zod:
         specifier: ^4.3.6
@@ -420,11 +417,6 @@ packages:
 
   get-tsconfig@4.13.6:
     resolution: {integrity: sha512-shZT/QMiSHc/YBLxxOkMtgSid5HFoauqCE3/exfsEcwg1WkeqjG+V40yBbBrsD+jW2HDXcs28xOfcbm2jI8Ddw==}
-
-  litivo-wrapper@0.3.11:
-    resolution: {integrity: sha512-YA5ccgMS5k4TRCxYWXwhgOEZWlaANVrGAtIalQcCp7p0uiHBhbHZe4iSPtZU/qQu+sBKIeHcAFunzFrtdO6cHg==}
-    peerDependencies:
-      playwright: ^1.58.0
 
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
@@ -863,11 +855,6 @@ snapshots:
   get-tsconfig@4.13.6:
     dependencies:
       resolve-pkg-maps: 1.0.0
-
-  litivo-wrapper@0.3.11(playwright@1.58.2):
-    dependencies:
-      playwright: 1.58.2
-      zod: 4.3.6
 
   magic-string@0.30.21:
     dependencies:
