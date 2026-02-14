@@ -54,7 +54,7 @@ class CreateInsolvencyPage extends FootedPage {
 
     throw new Error('Method not fullyimplemented yet.');
 
-    await this.creditorSection.send(insolvency.creditor);
+    await this.creditorSection.send(insolvency.creditors);
     await this.assetsSection.send(insolvency.assets);
     await this.jaoppSection.send(insolvency.jaopp);
     await this.childSupportObligationsSection.send(insolvency.childSupportObligations);
