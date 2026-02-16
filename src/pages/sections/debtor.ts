@@ -136,6 +136,8 @@ class DebtorSection extends BaseSection<[DebtorType[]]> {
 
       await this.selectOption(this.idTypeInput, docType);
       await this.idNumberInput.fill(docNumber);
+
+      // TODO: This fails if debtor has already and open insolvency application or draft.
       await this.searchButton.click();
 
       await this.fillInput(this.documentIssueCityInput, idDoc.issueCity);

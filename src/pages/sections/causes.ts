@@ -3,8 +3,6 @@ import { getInputSelector } from '../../helpers.js';
 import type { CausesType } from '../../models/causes.js';
 import BaseSection from '../bases/section.js';
 
-
-/** TODO: Causes (feat: extend create insolvency method with causes section) */
 class CausesSection extends BaseSection<[CausesType]> {
   private readonly departmentInput: Locator;
   private readonly cityInput: Locator;
@@ -19,8 +17,6 @@ class CausesSection extends BaseSection<[CausesType]> {
     this.submitButton = page.locator('button.btn-guardar:not([disabled]):has-text("Siguiente")');
   }
 
-
-
   public async send(causes: CausesType): Promise<void> {
     await this.fillInput(this.departmentInput, causes.department);
     await this.fillInput(this.cityInput, causes.city);
@@ -28,7 +24,9 @@ class CausesSection extends BaseSection<[CausesType]> {
       await this.addCauseButton.click();
 
       const CauseTypeInput: Locator = this.page.locator(getInputSelector('claseCausa'));
-      const CauseDescriptionDiv: Locator = this.page.locator("div.fr-element.fr-view[aria-disabled='false']");
+      const CauseDescriptionDiv: Locator = this.page.locator(
+        "div.fr-element.fr-view[aria-disabled='false']",
+      );
       const SaveCauseButton: Locator = this.page.locator('button:has-text("GUARDAR")');
 
       await this.fillInput(CauseTypeInput, cause.type);
