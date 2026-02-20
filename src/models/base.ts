@@ -23,8 +23,16 @@ const IdentificationDocumentSchema = z.object({
     type: z.string().trim().min(1), // Known fixed options.
     number: z.string().trim().min(1), // TODO: Make number.
 });
-
 const JudicialNotificationAddressSchema = z.object({
+    roadType: RoadTypeEnum.optional(), 
+    roadName: z.string().trim().optional(),
+    roadNumber: z.string().trim().min(1).optional(), // Mandatory if roadType, roadName, roadDetail or roadStratum is present.
+    roadSubNumber: z.string().trim().min(1).optional(), // Mandatory if roadType, roadName, roadDetail or roadStratum is present.
+    roadDetails: z.string().trim().trim().optional(), // TODO: Examples: "apto", "casa", "referencia".
+    roadStratum: z.string().trim().min(1).optional(), // TODO: "ESTRATO 1", "ESTRATO 2", ..., "ESTRATO 6", "NO INFORMA".
+});
+
+const JudicialNotificationAddressRequiredSchema = z.object({
     roadType: RoadTypeEnum, 
     roadName: z.string().trim(),
     roadNumber: z.string().trim().min(1), 
@@ -52,7 +60,7 @@ const IdenticationDataSchema = z.object({
 type IdenticationDataType = z.infer<typeof IdenticationDataSchema>;
 type ContactInformationType = z.infer<typeof ContactInformationSchema>;
 
-export { ContactInformationSchema, IdenticationDataSchema, JudicialNotificationAddressSchema, StudyDataEnum };
+export { ContactInformationSchema, IdenticationDataSchema, JudicialNotificationAddressRequiredSchema, StudyDataEnum };
 export type { ContactInformationType, IdenticationDataType };
 
 
