@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { CausesSchema } from './causes.js';
 
+import { AssetInmuebleSchema, AssetOtrosMueblesSchema, AssetVehicularSchema } from './assets.js';
 import { CreditorJuridicaSchema, CreditorNaturalSchema } from './creditor.js';
 import type { DebtorType, ExIdDocType, ProfessionType } from './debtor.js';
 import { DebtorSchema, ExIdDocSchema, ProfessionSchema } from './debtor.js';
@@ -14,7 +15,7 @@ const InsolvencySchema = z.object({
   debtors: z.array(DebtorSchema).min(1), // Idk the maximum number of debtors. TODO: Investigate if .min(1) and .nonempty() is the same for this case. Check if asking for a tuple instead breaks something.
   causes: CausesSchema,
   creditors: z.array(z.union([CreditorNaturalSchema, CreditorJuridicaSchema])).min(2),
-  assets: z.unknown(),
+  assets: z.array(z.union([AssetVehicularSchema, AssetInmuebleSchema, AssetOtrosMueblesSchema])).optional(), 
   jaopp: z.unknown(),
   childSupportObligations: z.unknown(),
   availableResources: z.unknown(),
