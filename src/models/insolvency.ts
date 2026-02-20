@@ -13,7 +13,7 @@ const InsolvencySchema = z.object({
   debtor: DebtorSchema,
   causes: CausesSchema,
   creditors: CreditorsSchema,
-  assets: AssetsSchema.optional(), 
+  assets: AssetsSchema.optional(),
   jaopp: z.unknown(),
   childSupportObligations: z.unknown(),
   availableResources: z.unknown(),

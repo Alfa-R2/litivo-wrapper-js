@@ -59,9 +59,12 @@ class CreateInsolvencyPage extends FootedPage {
       await this.creditorSection.send(insolvency.creditors);
     }
 
+    if (await page.locator('h2', { hasText: 'BIENES' }).isVisible()) {
+      await this.assetsSection.send(insolvency.assets || []);
+    }
+
     throw new Error('Method not fullyimplemented yet.');
 
-    await this.assetsSection.send(insolvency.assets);
     await this.jaoppSection.send(insolvency.jaopp);
     await this.childSupportObligationsSection.send(insolvency.childSupportObligations);
     await this.availableResourcesSection.send(insolvency.availableResources);
