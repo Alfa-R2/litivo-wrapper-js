@@ -23,6 +23,10 @@ export default defineConfig({
   // Generate an HTML report after tests finish
   // You can open it with: npx playwright show-report
   reporter: 'html',
+
+  use: {
+    permissions: ['clipboard-read'],
+  },
 });
 
 process.loadEnvFile();

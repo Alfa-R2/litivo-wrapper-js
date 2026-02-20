@@ -49,12 +49,18 @@ class CreateInsolvencyPage extends FootedPage {
   public async createInsolvency(insolvency: InsolvencyType): Promise<void> {
     await this.goto();
     await this.siteSection.send(insolvency.site);
-    await this.debtorSection.send(insolvency.debtors);
-    await this.causesSection.send(insolvency.causes);
+    await this.debtorSection.send(insolvency.debtor);
+
+    const page = this.page;
+    if (await page.locator('h2', { hasText: 'CAUSAS' }).isVisible()) {
+      await this.causesSection.send(insolvency.causes);
+    }
+    if (await page.locator('h2', { hasText: 'ACREEDOR' }).isVisible()) {
+      await this.creditorSection.send(insolvency.creditors);
+    }
 
     throw new Error('Method not fullyimplemented yet.');
 
-    await this.creditorSection.send(insolvency.creditors);
     await this.assetsSection.send(insolvency.assets);
     await this.jaoppSection.send(insolvency.jaopp);
     await this.childSupportObligationsSection.send(insolvency.childSupportObligations);

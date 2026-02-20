@@ -2,7 +2,9 @@ import { chromium, type Browser, type BrowserContext } from 'playwright';
 import main from './main.js';
 
 const browser: Browser = await chromium.launch({ channel: 'msedge', headless: false });
-const browserContext: BrowserContext = await browser.newContext();
+const browserContext: BrowserContext = await browser.newContext({
+  permissions: ['clipboard-read'],
+});
 try {
   await main(browserContext);
 } catch (error) {
