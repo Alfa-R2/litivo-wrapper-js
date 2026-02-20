@@ -1,4 +1,5 @@
 import z from 'zod';
+import { AssetsSchema } from './assets.js';
 import CausesSchema from './causes.js';
 import { CreditorsSchema } from './creditor.js';
 import DebtorSchema from './debtor.js';
@@ -12,7 +13,7 @@ const InsolvencySchema = z.object({
   debtor: DebtorSchema,
   causes: CausesSchema,
   creditors: CreditorsSchema,
-  assets: z.unknown(),
+  assets: AssetsSchema.optional(), 
   jaopp: z.unknown(),
   childSupportObligations: z.unknown(),
   availableResources: z.unknown(),
