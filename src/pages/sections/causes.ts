@@ -18,16 +18,20 @@ class CausesSection extends BaseSection<[CausesType]> {
   }
 
   public async send(causes: CausesType): Promise<void> {
+    const page: Page = this.page;
+
     await this.fillInput(this.departmentInput, causes.department);
     await this.fillInput(this.cityInput, causes.city);
     for (const cause of causes.causes) {
+      // TODO: Skip cause if it already exists (Now wrapper can continue drafts) .
+
       await this.addCauseButton.click();
 
-      const CauseTypeInput: Locator = this.page.locator(getInputSelector('claseCausa'));
-      const CauseDescriptionDiv: Locator = this.page.locator(
+      const CauseTypeInput: Locator = page.locator(getInputSelector('claseCausa'));
+      const CauseDescriptionDiv: Locator = page.locator(
         "div.fr-element.fr-view[aria-disabled='false']",
       );
-      const SaveCauseButton: Locator = this.page.locator('button:has-text("GUARDAR")');
+      const SaveCauseButton: Locator = page.locator('button:has-text("GUARDAR")');
 
       await this.fillInput(CauseTypeInput, cause.type);
       await CauseDescriptionDiv.fill(cause.description);

@@ -16,6 +16,30 @@ abstract class BaseSection<T extends unknown[]> extends Paged {
     return this.page.locator(`nz-option-item[title="${title}"]`);
   }
 
+  protected async goToDraft(): Promise<void> {
+    const page: Page = this.page;
+
+    const shareLink = page.locator('a', { hasText: 'Compartir expediente digital' });
+
+    // Close modal if open
+    await page.keyboard.press('Escape');
+
+    await shareLink.click();
+    await page.locator('span[nz-tooltip="Click para copiar enlace"]').click();
+    const clipboardContent = await page.evaluate(() => navigator.clipboard.readText());
+
+    const currentUrl = page.url();
+    const url = new URL(clipboardContent);
+    const segments = url.pathname.split('/').filter(Boolean);
+    const code = segments[segments.length - 1] || ''; // Never ''
+
+    const newUrl = `${currentUrl}/${code}`;
+
+    await page.goto(newUrl);
+
+    await page.waitForTimeout(1_000);
+  }
+
   /** Fills the input with the provided value selecting the first option. */
   protected async fillInput(nzSelect: Locator, value: string): Promise<void> {
     const input: Locator = nzSelect.locator('input');

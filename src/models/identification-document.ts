@@ -1,24 +1,29 @@
-import { z } from 'zod';
+import z from 'zod';
+import { NaturalPersonIdDocumentSchema } from './enums/natural-person-id-documents.js';
 
-const IdentificationDocumentSchema = z.object({
-  type: z.string().trim().min(1), // TODO: "CÉDULA DE CIUDADANÍA", "CÉDULA DE EXTRANJERÍA", "NÚMERO DE IDENTIFICACIÓN DE EXTRANJERO", "PASAPORTE", "REGISTRO CIVIL", "TARJETA DE IDENTIDAD".
-  number: z.string().trim().min(1), // TODO: Make number.
-  filePath: z.string().trim().min(1), // TODO: Has to exist or has to be bytes.
-});
+const IdentificationDocumentSchema = z
+  .object({
+    type: NaturalPersonIdDocumentSchema,
+    value: z.string().trim().min(1),
+    issueCity: z.string().trim().min(1).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (
+      data.type === 'CÉDULA DE CIUDADANÍA' &&
+      (!data.issueCity || data.issueCity.trim().length === 0)
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['issueCity'],
+        message: 'issueCity is required for CÉDULA DE CIUDADANÍA',
+      });
+    }
+  });
 
 type IdentificationDocumentType = z.infer<typeof IdentificationDocumentSchema>;
 
 const IdDocSchema = IdentificationDocumentSchema;
 type IdDocType = IdentificationDocumentType;
 
-const ExtendedIdentificationDocumentSchema = IdentificationDocumentSchema.extend({
-  issueCity: z.string().trim().min(1),
-});
-
-type ExtendedIdentificationDocumentType = z.infer<typeof ExtendedIdentificationDocumentSchema>;
-
-const ExIdDocSchema = ExtendedIdentificationDocumentSchema;
-type ExIdDocType = ExtendedIdentificationDocumentType;
-
-export { ExIdDocSchema, IdDocSchema };
-export type { ExIdDocType, IdDocType };
+export { IdDocSchema };
+export type { IdDocType };
