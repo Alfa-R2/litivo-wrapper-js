@@ -40,7 +40,7 @@ class CausesSection extends BaseSection<[CausesType]> {
       await SaveCauseButton.waitFor({ state: 'detached' });
     }
     await this.submitButton.click();
-    await this.submitButton.waitFor({ state: 'detached' });
+    await page.locator('h2', { hasText: 'ACREEDOR' }).waitFor();
   }
 }
 

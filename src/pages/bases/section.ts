@@ -5,6 +5,9 @@ import Paged from './paged.js';
 
 const isoDateSchema = z.iso.date();
 
+const BASE_DRAFT_URL = 'https://www.litivo.com/insolvencia/crear/';
+const DRAFT_URL_PATTERN = new RegExp(`^${BASE_DRAFT_URL.replace(/\//g, '\\/')}\\d+$`);
+
 // TODO: Do not fill if already selected
 
 abstract class BaseSection<T extends unknown[]> extends Paged {
@@ -19,25 +22,46 @@ abstract class BaseSection<T extends unknown[]> extends Paged {
   protected async goToDraft(): Promise<void> {
     const page: Page = this.page;
 
-    const shareLink = page.locator('a', { hasText: 'Compartir expediente digital' });
+    if (DRAFT_URL_PATTERN.test(page.url())) {
+      await page.reload();
+    } else {
+      const shareLink = page.locator('a', { hasText: 'Compartir expediente digital' });
+      const copyLinkButton = page.locator('span[nz-tooltip="Click para copiar enlace"]');
 
-    // Close modal if open
-    await page.keyboard.press('Escape');
+      await page.keyboard.press('Escape'); // Close modal if open
+      await shareLink.click();
+      await copyLinkButton.click();
+      const clipboardContent = await page.evaluate(() => navigator.clipboard.readText());
 
-    await shareLink.click();
-    await page.locator('span[nz-tooltip="Click para copiar enlace"]').click();
-    const clipboardContent = await page.evaluate(() => navigator.clipboard.readText());
+      // TODO: Find why this fails sometimes giving urls like notFoundUrl
+      // const notFoundUrl = 'https://www.litivo.com/auth/404';
+      if (clipboardContent.includes('auth/404')) {
+        await page.waitForTimeout(1_000); // TODO: Find a better way to wait for the page to load
+        await copyLinkButton.click();
+        const clipboardContent2 = await page.evaluate(() => navigator.clipboard.readText());
+        if (clipboardContent2.includes('auth/404')) {
+          throw new Error('Failed to copy draft link to clipboard');
+        }
+      }
 
-    const currentUrl = page.url();
-    const url = new URL(clipboardContent);
-    const segments = url.pathname.split('/').filter(Boolean);
-    const code = segments[segments.length - 1] || ''; // Never ''
+      const currentUrl = page.url();
+      const url = new URL(clipboardContent);
+      const segments = url.pathname.split('/').filter(Boolean);
+      const code = segments[segments.length - 1] || ''; // Never ''
 
-    const newUrl = `${currentUrl}/${code}`;
+      console.log(`Draft ${code} loaded`);
 
-    await page.goto(newUrl);
+      const newUrl = `${currentUrl}/${code}`;
 
-    await page.waitForTimeout(1_000);
+      await page.goto(newUrl);
+    }
+    await page.locator('h2').waitFor(); // NOTE: Section title
+
+    await page.waitForTimeout(1_000); // TODO: Find a better way to wait for the page to load
+  }
+
+  protected async deleteDraft(code: string): Promise<void> {
+    // TODO
   }
 
   /** Fills the input with the provided value selecting the first option. */

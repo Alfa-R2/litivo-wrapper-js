@@ -2,6 +2,7 @@ import z from 'zod';
 import { AssetsSchema } from './assets.js';
 import CausesSchema from './causes.js';
 import { CreditorsSchema } from './creditor.js';
+import DebtNegotiationSchema from './debt-negotiation.js';
 import DebtorSchema from './debtor.js';
 import SiteSchema from './site.js';
 
@@ -14,10 +15,10 @@ const InsolvencySchema = z.object({
   causes: CausesSchema,
   creditors: CreditorsSchema,
   assets: AssetsSchema.optional(),
-  jaopp: z.unknown(),
-  childSupportObligations: z.unknown(),
-  availableResources: z.unknown(),
-  debtNegotiation: z.unknown(),
+  jaopp: z.unknown().optional(),
+  childSupportObligations: z.unknown().optional(),
+  availableResources: z.unknown().optional(),
+  debtNegotiation: DebtNegotiationSchema,
   attachedDocuments: z.unknown(),
   applicationSubmission: z.unknown(),
 });

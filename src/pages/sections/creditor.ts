@@ -490,11 +490,13 @@ class CreditorSection extends BaseSection<[CreditorsType]> {
 
       // === Add credits ===
 
-      if (await creditsButton.isVisible()) {
+      await page.waitForTimeout(1_000); // TODO: find a better way to wait
+
+      if (!(await creditsButton.isVisible())) {
         // Try to reload the page if the creditor is not visible by a bug.
         await this.goToDraft();
 
-        if (await creditsButton.isVisible()) {
+        if (!(await creditsButton.isVisible())) {
           throw new Error(
             'Added creditor is not visible, continue from the draft of the creditor (you must go out of this page first).',
           ); // TODO: Make the wrapper do this instead of throwing an error.
@@ -621,7 +623,7 @@ class CreditorSection extends BaseSection<[CreditorsType]> {
       // TODO: Allow the posibility to add legal representatives.
     }
     await this.submitButton.click();
-    await this.addCreditorButton.waitFor({ state: 'detached' });
+    await page.locator('h2', { hasText: 'BIENES' }).waitFor();
   }
 }
 

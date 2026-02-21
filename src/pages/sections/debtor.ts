@@ -543,7 +543,7 @@ class DebtorSection extends BaseSection<[DebtorType]> {
     const nextButton = page.locator('button', { hasText: 'Siguiente' }); // TODO: Find a better way to get the locator.
     await nextButton.click();
 
-    await this.addDebtorButton.waitFor({ state: 'detached' });
+    await page.locator('h2', { hasText: 'CAUSAS' }).waitFor();
   }
 }
 

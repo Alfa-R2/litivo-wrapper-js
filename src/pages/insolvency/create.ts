@@ -52,6 +52,9 @@ class CreateInsolvencyPage extends FootedPage {
     await this.debtorSection.send(insolvency.debtor);
 
     const page = this.page;
+    // pause all routes of the page to frezze it
+    // await page.route('**/*', (route) => route.abort());
+
     if (await page.locator('h2', { hasText: 'CAUSAS' }).isVisible()) {
       await this.causesSection.send(insolvency.causes);
     }
@@ -60,17 +63,50 @@ class CreateInsolvencyPage extends FootedPage {
     }
 
     if (await page.locator('h2', { hasText: 'BIENES' }).isVisible()) {
-      await this.assetsSection.send(insolvency.assets || []);
+      // TODO: Do it later, it is optional.
+      await this.assetsSection.send([]);
+      // await this.assetsSection.send(insolvency.assets || []);
     }
 
-    throw new Error('Method not fullyimplemented yet.');
+    if (
+      await page
+        .locator('h2', { hasText: 'PROCESOS JUDICIALES, ADMINISTRATIVOS O PRIVADOS' })
+        .isVisible()
+    ) {
+      // TODO: Do it later, it is optional.
+      await this.jaoppSection.send(insolvency.jaopp);
+    }
 
-    await this.jaoppSection.send(insolvency.jaopp);
-    await this.childSupportObligationsSection.send(insolvency.childSupportObligations);
-    await this.availableResourcesSection.send(insolvency.availableResources);
-    await this.debtNegotiationSection.send(insolvency.debtNegotiation);
-    await this.attachedDocumentsSection.send(insolvency.attachedDocuments);
-    await this.applicationSubmissionSection.send(insolvency.applicationSubmission);
+    if (await page.locator('h2', { hasText: 'OBLIGACIONES ALIMENTARIAS' }).isVisible()) {
+      // TODO: Do it later, it is optional.
+      await this.childSupportObligationsSection.send(insolvency.childSupportObligations);
+    }
+
+    if (await page.locator('h2', { hasText: 'RECURSOS DISPONIBLES' }).isVisible()) {
+      // TODO: Do it later, it is optional.
+      await this.availableResourcesSection.send(insolvency.availableResources);
+    }
+
+    if (await page.locator('h2', { hasText: 'NEGOCIACIÓN DE DEUDAS' }).isVisible()) {
+      // TODO: Complete
+      await this.debtNegotiationSection.send(insolvency.debtNegotiation);
+    }
+
+    if (await page.locator('h2', { hasText: 'DOCUMENTOS ANEXOS' }).isVisible()) {
+      // TODO: Do it later, it is optional.
+      await this.attachedDocumentsSection.send(insolvency.attachedDocuments);
+    }
+
+    try {
+      // NOTE: Not automated because it requires a legal representative signature.
+      await this.applicationSubmissionSection.send(insolvency.applicationSubmission);
+    } catch (error) {
+      console.log(
+        'Cannot submit the application, requires manual signature from a legal representative.',
+      );
+    }
+
+    console.log('Insolvency draft created successfully');
   }
 }
 

@@ -4,7 +4,8 @@ import { test } from './fixtures/wrapper.fixture.js';
 
 test.describe('Wrapper Tests', () => {
   test('Test insolvency', async ({ litivo }) => {
+    // NOTE: This test usually fails in headless mode, because it makes harder to find the elements, so it is recommended to run it in headed mode until a solution is found.
     await litivo.createInsolvency(insolvency);
-    await litivo.waitforTimeout(500); // Breakpoint line();
+    // TODO: Make a delete draft method a use it at the end of the test to clean up the created draft.
   });
 });
