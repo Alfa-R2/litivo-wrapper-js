@@ -4,6 +4,7 @@ import CausesSchema from './causes.js';
 import { CreditorsSchema } from './creditor.js';
 import DebtNegotiationSchema from './debt-negotiation.js';
 import DebtorSchema from './debtor.js';
+import { JaoppSchema } from './jaopp.js';
 import SiteSchema from './site.js';
 
 // TODO: Add progressively the needed validations.
@@ -15,7 +16,7 @@ const InsolvencySchema = z.object({
   causes: CausesSchema,
   creditors: CreditorsSchema,
   assets: AssetsSchema.optional(),
-  jaopp: z.unknown().optional(),
+  jaopp: JaoppSchema.optional(),
   childSupportObligations: z.unknown().optional(),
   availableResources: z.unknown().optional(),
   debtNegotiation: DebtNegotiationSchema,
@@ -28,3 +29,4 @@ type InsolvencyType = z.infer<typeof InsolvencySchema>;
 export default InsolvencySchema;
 export { InsolvencySchema };
 export type { InsolvencyType };
+
