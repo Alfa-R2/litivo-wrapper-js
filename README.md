@@ -52,7 +52,7 @@ npx playwright install
 
 ## 🧪 Example
 
-[See the full example here](./example/main.ts) 📄
+[See the full example here](./examples/index.ts) 📄
 
 ---
 

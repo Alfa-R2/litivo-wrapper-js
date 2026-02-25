@@ -5,6 +5,7 @@ import AuthenticatedPage from './pages/bases/authenticated.js';
 import DashboardPage from './pages/dashboard.js';
 import CreateInsolvencyPage from './pages/insolvency/create.js';
 import LoginPage from './pages/login.js';
+import { assertClipboardPermissionGranted } from './utils/clipboard.js';
 
 /** Wrapper class for Litivo interactions using Playwright.
  *
@@ -25,6 +26,8 @@ class Litivo {
    */
   public async login(email: string, password: string): Promise<void> {
     const page: Page = await this.context.newPage(); // TODO: Check if it will be good to close former pagge if it setted up yet.
+
+    await assertClipboardPermissionGranted(page);
 
     const loginPage = new LoginPage(page);
     await loginPage.login(email, password);
