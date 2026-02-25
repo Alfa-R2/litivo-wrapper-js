@@ -1,10 +1,15 @@
 import z from 'zod';
 import { AssetsSchema } from './assets.js';
+import { AttachedDocumentsSchema } from './attached-documents.js';
+import { AvailableResourcesSchema } from './available-resources.js';
 import CausesSchema from './causes.js';
+import { childSupportObligationsSchema } from './child-support-obligation.js';
 import { CreditorsSchema } from './creditor.js';
 import DebtNegotiationSchema from './debt-negotiation.js';
 import DebtorSchema from './debtor.js';
+import { JaoppSchema } from './jaopp.js';
 import SiteSchema from './site.js';
+
 
 // TODO: Add progressively the needed validations.
 // TODO: Add strict validations after completing the form. this is due to time constraints.
@@ -15,11 +20,11 @@ const InsolvencySchema = z.object({
   causes: CausesSchema,
   creditors: CreditorsSchema,
   assets: AssetsSchema.optional(),
-  jaopp: z.unknown().optional(),
-  childSupportObligations: z.unknown().optional(),
-  availableResources: z.unknown().optional(),
+  jaopp: JaoppSchema.optional(),
+  childSupportObligations: childSupportObligationsSchema.optional(),
+  availableResources: AvailableResourcesSchema.optional(),
   debtNegotiation: DebtNegotiationSchema,
-  attachedDocuments: z.unknown(),
+  attachedDocuments: AttachedDocumentsSchema.optional(),
   applicationSubmission: z.unknown(),
 });
 
@@ -28,3 +33,4 @@ type InsolvencyType = z.infer<typeof InsolvencySchema>;
 export default InsolvencySchema;
 export { InsolvencySchema };
 export type { InsolvencyType };
+

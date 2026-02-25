@@ -51,3 +51,4 @@ type AssetsType = z.infer<typeof AssetsSchema>;
 
 export { AssetInmuebleSchema, AssetOtrosMueblesSchema, AssetsSchema, AssetVehicularSchema };
 export type { AssetInmuebleType, AssetOtrosMueblesType, AssetsType, AssetVehicularType };
+
