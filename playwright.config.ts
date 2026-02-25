@@ -28,5 +28,3 @@ export default defineConfig({
     permissions: ['clipboard-read'],
   },
 });
-
-process.loadEnvFile();

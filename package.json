@@ -1,6 +1,6 @@
 {
     "name": "litivo-wrapper",
-    "version": "0.3.18",
+    "version": "0.3.19",
     "type": "module",
     "description": "Litivo Wrapper.",
     "main": "./dist/index.js",
@@ -18,7 +18,7 @@
     ],
     "scripts": {
         "build": "tsc",
-        "example": "tsc && tsx example",
+        "example": "tsc && tsx examples/index.ts",
         "test": "vitest run && playwright test",
         "test:unit": "vitest",
         "test:e2e": "playwright test",

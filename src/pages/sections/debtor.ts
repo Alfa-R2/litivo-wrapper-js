@@ -172,6 +172,12 @@ class DebtorSection extends BaseSection<[DebtorType]> {
       const namedTr = page.locator('tr', { has: namedTd });
 
       const continueProcessButton = namedTr.locator('a[nztooltiptitle="Continuar proceso"]');
+
+      // TODO: There is an error when there is more than one debtor's drafts.
+      // NOTE: This may happens after a draft reaches application submission section.
+      // NOTE: The causes are still unknown
+      // NOTE: This is not a bug, but this breaks the flow.
+      // NOTE: Maybe this is due because system allow one draft per debtor at the time most of the time, but once saved before application submission, another one can be created based on this first once, by going to another section, but just a second one is created, no more.
       await continueProcessButton.click();
 
       await page.waitForLoadState();
