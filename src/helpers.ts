@@ -1,8 +1,6 @@
 import type { Page } from "playwright";
 import type { JudicialNotificationAddressRequiredType } from "./models/base.js";
 
-
-
 // TODO: Check if this can be placed into SectionBase instead of being a helper
 function getInputSelector(id: string): string {
   return `nz-select[formcontrolname="${id}"]`;
@@ -11,6 +9,16 @@ function getDateInputSelector(id: string): string {
   return `nz-date-picker[formcontrolname="${id}"]`;
 }
 
+
+async function checkCheckBox(page: Page, formControlName: string): Promise<void> {
+  const label = page.locator(`label[formcontrolname="${formControlName}"]`);
+  const hasChecked = await label.locator('input[type="checkbox"]').isChecked();
+
+  if (!hasChecked) {
+    await label.click();
+  }
+
+}
 
 async function fillJudicialNotificationAddress(page: Page, address: JudicialNotificationAddressRequiredType): Promise<void> {
   const roadName: string = address.roadName || '';
@@ -38,5 +46,5 @@ async function fillJudicialNotificationAddress(page: Page, address: JudicialNoti
 
 }
 
-export { fillJudicialNotificationAddress, getDateInputSelector, getInputSelector };
+export { checkCheckBox, fillJudicialNotificationAddress, getDateInputSelector, getInputSelector };
 

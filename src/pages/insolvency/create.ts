@@ -72,7 +72,6 @@ class CreateInsolvencyPage extends FootedPage {
     }
 
     if (await page.locator('h2', { hasText: 'OBLIGACIONES ALIMENTARIAS' }).isVisible()) {
-      // TODO: Do it later, it is optional.
       await this.childSupportObligationsSection.send(insolvency.childSupportObligations);
     }
 

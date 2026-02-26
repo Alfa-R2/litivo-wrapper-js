@@ -1,11 +1,12 @@
 import z from "zod";
+import { ContactInformationSchema } from "./base.js";
 import { IdentificationDocumentBaseSchema } from "./identification-document.js";
 import { NaturalPersonIdDataSchema } from "./natural-person.js";
 
 const BeneficiarySchema = NaturalPersonIdDataSchema.extend({
     birthDate: NaturalPersonIdDataSchema.shape.birthDate.optional(),
-    idDoc: IdentificationDocumentBaseSchema
-
+    idDoc: IdentificationDocumentBaseSchema,
+    contactInformation: ContactInformationSchema
 });
 
 const childSupportObligationSchema = z.object({
@@ -20,7 +21,8 @@ const childSupportObligationSchema = z.object({
 const childSupportObligationsSchema = z.array(childSupportObligationSchema);
 type ChildSupportObligationType = z.infer<typeof childSupportObligationSchema>;
 type ChildSupportObligationsType = z.infer<typeof childSupportObligationsSchema>;
+type BeneficiaryType = z.infer<typeof BeneficiarySchema>;
 
 export { childSupportObligationSchema, childSupportObligationsSchema };
-export type { ChildSupportObligationsType, ChildSupportObligationType };
+export type { BeneficiaryType, ChildSupportObligationsType, ChildSupportObligationType };
 
