@@ -25,10 +25,14 @@ const AvailableResourceDefinedSchema = AvailableResourceSchema.extend({
     ]),
 });
 
-const AvailableResourcesSchema = z.array(z.union([AvailableResourceSchema, AvailableResourceDefinedSchema]));
-type AvailableResourceBaseType = z.infer<typeof AvailableResourceSchema>;
+const AvailableResourcesSchema = z.array(z.union([AvailableResourceSchema, AvailableResourceDefinedSchema])).refine(
+    (arr) => new Set(arr).size === arr.length,
+    { message: "No se permiten valores duplicados" }
+);
 type AvailableResourceType = z.infer<typeof AvailableResourceSchema>;
+type AvailableResourceDefinedType = z.infer<typeof AvailableResourceDefinedSchema>;
+type AvailableResourcesType = z.infer<typeof AvailableResourcesSchema>;
 
-export { AvailableResourcesSchema };
-export type { AvailableResourceBaseType, AvailableResourceType };
+export { AvailableResourceDefinedSchema, AvailableResourceSchema, AvailableResourcesSchema };
+export type { AvailableResourceDefinedType, AvailableResourcesType, AvailableResourceType };
 
