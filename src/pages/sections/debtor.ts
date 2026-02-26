@@ -235,7 +235,7 @@ class DebtorSection extends BaseSection<[DebtorType]> {
     }
 
     // Contact Information
-
+    // todo: Convertir en reutilizable
     const residenceCountryInputValue = await this.residenceCountryInput.innerText();
     if (residenceCountryInputValue !== residenceCountry) {
       await this.fillInput(this.residenceCountryInput, residenceCountry);

@@ -21,9 +21,9 @@ abstract class BaseSection<T extends unknown[]> extends Paged {
     const fileInput = page.locator('input[type="file"]#undefined');
     const uploadFileButton = page.locator('button:not([disabled])', { hasText: 'Subir' });
 
-    uploadButton.click();
-    fileInput.setInputFiles(filePath);
-    uploadFileButton.click();
+    await uploadButton.click();
+    await fileInput.setInputFiles(filePath);
+    await uploadFileButton.click();
   }
 
   private getOptionDiv(title: string): Locator {
@@ -79,7 +79,9 @@ abstract class BaseSection<T extends unknown[]> extends Paged {
   protected async fillInput(nzSelect: Locator, value: string): Promise<void> {
     const input: Locator = nzSelect.locator('input');
     await nzSelect.click();
+    await input.evaluate((el:HTMLInputElement)=>{el.removeAttribute('readonly')});
     await input.fill(value);
+
     const optionDiv: Locator = this.getOptionDiv(value);
     await optionDiv.click();
     await this.page.waitForTimeout(500); // TODO: find a better way to wait for the input to be filled.

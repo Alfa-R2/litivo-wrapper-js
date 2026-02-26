@@ -40,7 +40,7 @@ class AssetsSection extends BaseSection<[AssetsType]> {
       await this.uploadFile('AGREGAR COPIA DE TARJETA DE PROPIEDAD', asset.ownershipCardFilePath);
     }
     else {
-      await this.selectOption(
+      await this.fillInput(
         page.locator(getInputSelector('clasificacion')), asset.clasification
       )
     }
@@ -57,8 +57,8 @@ class AssetsSection extends BaseSection<[AssetsType]> {
     const roadTypeInput = page.locator(getInputSelector('razonSocial'));
 
     await matriculaInput.fill(asset.matricula_inmobiliaria);
-    await this.selectOption(countryInput, asset.country);
-    await this.selectOption(roadTypeInput, asset.judicialNotificationAddress.roadType);
+    await this.fillInput(countryInput, asset.country);
+    await this.fillInput(roadTypeInput, asset.judicialNotificationAddress.roadType);
     await fillJudicialNotificationAddress(page, asset.judicialNotificationAddress);
     await participationPercentageInput.fill(asset.participationPercentage.toString());
 
