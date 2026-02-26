@@ -4,7 +4,7 @@ import type { InsolvencyType } from '../../models/insolvency.js';
 import FootedPage from '../bases/footed.js';
 // Sections
 import ApplicationSubmissionSection from '../sections/application-submission.js';
-import AssetsSection from '../sections/assets.js';
+import AssetsSection from '../sections/assets/assets.js';
 import AttachedDocumentsSection from '../sections/attached-documents.js';
 import AvailableResourcesSection from '../sections/available-resources.js';
 import CausesSection from '../sections/causes.js';
@@ -47,27 +47,21 @@ class CreateInsolvencyPage extends FootedPage {
   }
 
   public async createInsolvency(insolvency: InsolvencyType): Promise<void> {
+    const page = this.page;
     await this.goto();
+
     await this.siteSection.send(insolvency.site);
     await this.debtorSection.send(insolvency.debtor);
-
-    const page = this.page;
-    // pause all routes of the page to frezze it
-    // await page.route('**/*', (route) => route.abort());
-
+    
     if (await page.locator('h2', { hasText: 'CAUSAS' }).isVisible()) {
       await this.causesSection.send(insolvency.causes);
     }
     if (await page.locator('h2', { hasText: 'ACREEDOR' }).isVisible()) {
       await this.creditorSection.send(insolvency.creditors);
     }
-
-    if (await page.locator('h2', { hasText: 'BIENES' }).isVisible()) {
-      // TODO: Do it later, it is optional.
-      await this.assetsSection.send([]);
-      // await this.assetsSection.send(insolvency.assets || []);
+    if (await page.locator('h2', { hasText: 'BIENES' }).isVisible()) {      
+      await this.assetsSection.send(insolvency.assets);
     }
-
     if (
       await page
         .locator('h2', { hasText: 'PROCESOS JUDICIALES, ADMINISTRATIVOS O PRIVADOS' })

@@ -15,6 +15,17 @@ abstract class BaseSection<T extends unknown[]> extends Paged {
     super(page);
   }
 
+  protected async uploadFile(uploadTextButton: string, filePath: string): Promise<void> {
+    const page = this.page;
+    const uploadButton = page.locator("span", {hasText: uploadTextButton});
+    const fileInput = page.locator('input[type="file"]#undefined');
+    const uploadFileButton = page.locator('button:not([disabled])', { hasText: 'Subir' });
+
+    uploadButton.click();
+    fileInput.setInputFiles(filePath);
+    uploadFileButton.click();
+  }
+
   private getOptionDiv(title: string): Locator {
     return this.page.locator(`nz-option-item[title="${title}"]`);
   }
