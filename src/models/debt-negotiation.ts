@@ -3,7 +3,7 @@ import z from 'zod';
 
 const DebtNegotiationSchema = z.object({
   installments: z.number().int().min(1),
-  startDate: z.iso.date().default(() => new Date().toISOString()),
+  startDate: z.iso.date(),
 });
 type DebtNegotiationType = z.infer<typeof DebtNegotiationSchema>;
 

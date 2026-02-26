@@ -53,11 +53,13 @@ const IdenticationDataSchema = PersonNamePartsSchema.extend(
 
 type IdenticationDataType = z.infer<typeof IdenticationDataSchema>;
 type ContactInformationType = z.infer<typeof ContactInformationSchema>;
+type JudicialNotificationAddressRequiredType = z.infer<typeof JudicialNotificationAddressRequiredSchema>;
 
 export {
   ContactInformationSchema,
   IdenticationDataSchema,
   JudicialNotificationAddressRequiredSchema,
-  JudicialNotificationAddressSchema,
+  JudicialNotificationAddressSchema
 };
-export type { ContactInformationType, IdenticationDataType };
+export type { ContactInformationType, IdenticationDataType, JudicialNotificationAddressRequiredType };
+
