@@ -52,21 +52,18 @@ class CreateInsolvencyPage extends FootedPage {
 
     await this.siteSection.send(insolvency.site);
     await this.debtorSection.send(insolvency.debtor);
-    
+
     if (await page.locator('h2', { hasText: 'CAUSAS' }).isVisible()) {
       await this.causesSection.send(insolvency.causes);
     }
     if (await page.locator('h2', { hasText: 'ACREEDOR' }).isVisible()) {
       await this.creditorSection.send(insolvency.creditors);
     }
-    if (await page.locator('h2', { hasText: 'BIENES' }).isVisible()) {      
+    if (await page.locator('h2', { hasText: 'BIENES' }).isVisible()) {
       await this.assetsSection.send(insolvency.assets);
     }
-    if (
-      await page
-        .locator('h2', { hasText: 'PROCESOS JUDICIALES, ADMINISTRATIVOS O PRIVADOS' })
-        .isVisible()
-    ) {
+    const jaoppTitle = 'PROCESOS JUDICIALES, ADMINISTRATIVOS O PRIVADOS';
+    if (await page.locator('h2', { hasText: jaoppTitle }).isVisible()) {
       // TODO: Do it later, it is optional.
       await this.jaoppSection.send(insolvency.jaopp);
     }

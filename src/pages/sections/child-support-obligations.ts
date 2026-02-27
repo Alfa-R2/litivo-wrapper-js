@@ -1,11 +1,14 @@
 import type { Locator, Page } from 'playwright';
 import { plusSpanSelector } from '../../constants.js';
 import { checkCheckBox, getInputSelector } from '../../helpers.js';
-import type { BeneficiaryType, ChildSupportObligationsType } from '../../models/child-support-obligation.js';
+import type {
+  BeneficiaryType,
+  ChildSupportObligationsType,
+} from '../../models/child-support-obligation.js';
 import BaseSection from '../bases/section.js';
 
 /** TODO: Child Support Obligations (feat: extend create insolvency method with child support obligations section) */
-class ChildSupportObligationsSection extends BaseSection<[unknown]> {
+class ChildSupportObligationsSection extends BaseSection<[ChildSupportObligationsType]> {
   private readonly submitButton: Locator;
 
   constructor(page: Page) {
@@ -28,16 +31,18 @@ class ChildSupportObligationsSection extends BaseSection<[unknown]> {
     const nameInput = page.locator("input[formcontrolname='nombre1']");
     const lastNameInput = page.locator("input[formcontrolname='apellido1']");
     const genderInput = page.locator(getInputSelector('genero'));
-    const saveBeneficiaryButton = page.locator('button', {
-      hasText: 'GUARDAR',
-    }).last();
-    
+    const saveBeneficiaryButton = page
+      .locator('button', {
+        hasText: 'GUARDAR',
+      })
+      .last();
+
     await addBeneficiaryButton.click();
 
     await this.fillInput(idDocTypeInput, beneficiary.idDoc.type);
     await idDocNumberInput.fill(beneficiary.idDoc.value);
     await searchButton.click();
-    
+
     await this.fillInput(originCountryInput, beneficiary.originCountry);
     await nameInput.fill(beneficiary.firstName);
     await lastNameInput.fill(beneficiary.lastName);
@@ -83,7 +88,9 @@ class ChildSupportObligationsSection extends BaseSection<[unknown]> {
     await saveBeneficiaryButton.click();
   }
 
-  public async send(childSupportObligations: ChildSupportObligationsType| undefined): Promise<void> {
+  public async send(
+    childSupportObligations: ChildSupportObligationsType | undefined = [],
+  ): Promise<void> {
     const page = this.page;
     const addChildSupportObligationButton = page.locator('button', {
       hasText: 'AGREGAR OBLIGACIÓN ALIMENTARIA',
@@ -106,7 +113,10 @@ class ChildSupportObligationsSection extends BaseSection<[unknown]> {
       await cuantiaInput.fill(childSupportObligation.amount.toString());
       await this.selectOption(paymentFrequencyInput, childSupportObligation.paymentFrequency);
       await this.uploadFile('ANEXAR CERTIFICADO REDAM', childSupportObligation.redamFilePath);
-      await this.selectOption(parentalRelationshipInput, childSupportObligation.parentalRelationship);
+      await this.selectOption(
+        parentalRelationshipInput,
+        childSupportObligation.parentalRelationship,
+      );
 
       await saveButton.click();
     }

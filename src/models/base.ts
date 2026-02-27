@@ -25,6 +25,14 @@ const JudicialNotificationAddressSchema = z.object({
   roadStratum: NonEmptyTrimmedStringSchema.optional(), // TODO: "ESTRATO 1", "ESTRATO 2", ..., "ESTRATO 6", "NO INFORMA".
 });
 
+const JaoppAddressSchema = z.object({
+  roadType: RoadSchema.optional(),
+  roadName: TrimmedStringSchema.optional(),
+  roadNumber: NonEmptyTrimmedStringSchema.optional(),
+  roadSubNumber: NonEmptyTrimmedStringSchema.optional(),
+  roadDetails: TrimmedStringSchema.optional(), // TODO: Examples: "apto", "casa", "referencia".
+});
+
 const JudicialNotificationAddressRequiredSchema = z.object({
   roadType: RoadSchema,
   roadName: TrimmedStringSchema,
@@ -53,13 +61,19 @@ const IdenticationDataSchema = PersonNamePartsSchema.extend(
 
 type IdenticationDataType = z.infer<typeof IdenticationDataSchema>;
 type ContactInformationType = z.infer<typeof ContactInformationSchema>;
-type JudicialNotificationAddressRequiredType = z.infer<typeof JudicialNotificationAddressRequiredSchema>;
+type JudicialNotificationAddressRequiredType = z.infer<
+  typeof JudicialNotificationAddressRequiredSchema
+>;
 
 export {
   ContactInformationSchema,
   IdenticationDataSchema,
+  JaoppAddressSchema,
   JudicialNotificationAddressRequiredSchema,
-  JudicialNotificationAddressSchema
+  JudicialNotificationAddressSchema,
 };
-export type { ContactInformationType, IdenticationDataType, JudicialNotificationAddressRequiredType };
-
+export type {
+  ContactInformationType,
+  IdenticationDataType,
+  JudicialNotificationAddressRequiredType,
+};
