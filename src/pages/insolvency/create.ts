@@ -49,11 +49,6 @@ class CreateInsolvencyPage extends FootedPage {
   public async createInsolvency(insolvency: InsolvencyType): Promise<void> {
     const page = this.page;
     await this.goto();
-    
-    // if (await page.locator('h2', { hasText: 'NEGOCIACIÓN DE DEUDAS' }).isVisible()) {
-    //   // TODO: Complete
-    //   await this.debtNegotiationSection.send(insolvency.debtNegotiations);
-    // }
 
     await this.siteSection.send(insolvency.site);
     await this.debtorSection.send(insolvency.debtor);
