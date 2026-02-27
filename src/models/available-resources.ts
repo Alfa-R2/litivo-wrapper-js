@@ -31,7 +31,7 @@ const AvailableResourcesSchema = z.array(z.union([AvailableResourceSchema, Avail
         return new Set(types).size === types.length;
     },
     {
-        message: "No se permiten nombres duplicados",
+        message: "Duplicate names are not allowed",
         path: ["name"],
     }
 );

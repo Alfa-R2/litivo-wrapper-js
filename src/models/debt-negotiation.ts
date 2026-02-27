@@ -21,7 +21,7 @@ const DebtNegotiationsSchema = z.array(DebtNegotiationSchema).min(1).refine(
       return new Set(types).size === types.length;
     },
     {
-      message: "No se permiten creditType duplicados",
+      message: " Duplicate creditType are not allowed",
       path: ["creditType"],
     }
 );
