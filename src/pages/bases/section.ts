@@ -17,7 +17,7 @@ abstract class BaseSection<T extends unknown[]> extends Paged {
 
   protected async uploadFile(uploadTextButton: string, filePath: string): Promise<void> {
     const page = this.page;
-    const uploadButton = page.locator("span", {hasText: uploadTextButton});
+    const uploadButton = page.locator('span', { hasText: uploadTextButton });
     const fileInput = page.locator('input[type="file"]#undefined');
     const uploadFileButton = page.locator('button:not([disabled])', { hasText: 'Subir' });
 
@@ -79,7 +79,11 @@ abstract class BaseSection<T extends unknown[]> extends Paged {
   protected async fillInput(nzSelect: Locator, value: string): Promise<void> {
     const input: Locator = nzSelect.locator('input');
     await nzSelect.click();
-    await input.evaluate((el:HTMLInputElement)=>{el.removeAttribute('readonly')});
+    // NOTE: this allows to use thisf function like selectOption
+    // NOTE: This may replace selectOption methods that may fails if too many options because does not scrolls to make options visible.
+    await input.evaluate((el: HTMLInputElement) => {
+      el.removeAttribute('readonly');
+    });
     await input.fill(value);
 
     const optionDiv: Locator = this.getOptionDiv(value);

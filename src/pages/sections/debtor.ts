@@ -234,8 +234,7 @@ class DebtorSection extends BaseSection<[DebtorType]> {
       await this.selectDescriptedOption(this.disabilityInput, disability);
     }
 
-    // Contact Information
-    // todo: Convertir en reutilizable
+    // Contact Information. TODO: Make reusable
     const residenceCountryInputValue = await this.residenceCountryInput.innerText();
     if (residenceCountryInputValue !== residenceCountry) {
       await this.fillInput(this.residenceCountryInput, residenceCountry);

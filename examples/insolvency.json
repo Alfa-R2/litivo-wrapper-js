@@ -190,12 +190,93 @@
     }
   ],
   "assets": [
-    "TODO: Optional:An array of assets."
+    "TODO: Optional: An array of assets."
   ],
-  "jaopp": "TODO: Optional...",
+  "jaopp": [
+    "Optional: An array of JAOPP (Judicial, Administrative or Private Proceedings). Each obligation should include the creditor",
+    {
+      "jaoppType": "Literal: Judicial",
+      "processType":"Process type: 'Judicial', 'Privado' or 'Administrativo'",
+      "fullCourtNumberAndCourtType": "Full court number and court type",
+      "radicationNumber": "Radication number",
+      "department": "Department",
+      "city": "City",
+      "courtAddress": {
+        "roadType": "Road type (optional: 'Calle', 'Carrera', 'Avenida', 'Avenida carrera', 'Avenida calle', 'Circular', 'Circunvalar', 'Diagonal', 'Manzana', 'Transversal', 'Vía')",
+        "roadName": "Road name (optional)",
+        "roadNumber": "Road number (optional)",
+        "roadSubNumber": "Road sub number (optional)",
+        "roadDetails": "Road details (optional. Examples: 'apto', 'casa', 'referencia)"
+      },
+      "email": "Email Address",
+      "plaintiffsAreCreditors": "Optional: boolean indicating if plaintiffs are creditors. If set, plaintiffs must be set and defendant must not be set.",
+      "plaintiffs": "Array of plaintiff names (this means the proceeding is against). If set, cannot set defendant",
+      "defendant": "Defendant name (this means the proceeding is in favor). If set, cannot set plaintiffs",
+      "processStatus": "Process Status: 'Admitido', 'Con Sentencia' or 'En Ejecución'",
+      "value": "Amount in COP",
+      "supportFile": {
+        "name": "Support file name (supportFile is optional)",
+        "path": "Optional: Path to support file"
+      }
+    },
+    {
+      "jaoppType": "Literal: Privado",
+      "processType": "Process type: 'PROCESO COBRO DE OBLIGACIONES DINERARIAS', 'PROCESO DE JURISDICCIÓN COACTIVA', 'PROCESO EJECUCIÓN ESPECIAL', 'PROCESO EJECUTIVO' or 'PROCESO RESTITUCIÓN DE BIENES POR MORA EN EL PAGO DE LOS CÁNONES'",
+      "entityNameOrPersonInCharge": "Entity name or person in charge",
+      "description": "Optional: Description of the proceeding",
+      "radicationNumber": "Optional: Radication number",
+      "department": "Department",
+      "city": "City",
+      "address": {
+        "roadType": "Road type (optional: 'Calle', 'Carrera', 'Avenida', 'Avenida carrera', 'Avenida calle', 'Circular', 'Circunvalar', 'Diagonal', 'Manzana', 'Transversal', 'Vía')",
+        "roadName": "Road name (optional). address is optional.",
+        "roadNumber": "Road number (optional)",
+        "roadSubNumber": "Road sub number (optional)",
+        "roadDetails": "Road details (optional. Examples: 'apto', 'casa', 'referencia)"
+      },
+      "email": "Email Address",
+      "plaintiffsAreCreditors": "Optional: boolean indicating if plaintiffs are creditors. If set, plaintiffs must be set and defendant must not be set.",
+      "plaintiffs": "Array of plaintiff names (this means the proceeding is against). If set, cannot set defendant",
+      "defendant": "Defendant name (this means the proceeding is in favor). If set, cannot set plaintiffs",
+      "processStatus": "Optional string",
+      "value": "Amount in COP",
+      "supportFile": {
+        "name": "Support file name (supportFile is optional)",
+        "path": "Optional: Path to support file"
+      }
+    },
+    {
+      "jaoppType": "Literal: Administrativo",
+      "processType": "Process type: 'PROCESO COBRO DE OBLIGACIONES DINERARIAS', 'PROCESO DE JURISDICCIÓN COACTIVA', 'PROCESO EJECUCIÓN ESPECIAL', 'PROCESO EJECUTIVO' or 'PROCESO RESTITUCIÓN DE BIENES POR MORA EN EL PAGO DE LOS CÁNONES'",
+      "entityNameOrPersonInCharge": "Entity name or person in charge",
+      "description": "Optional: Description of the proceeding",
+      "radicationNumber": "Optional: Radication number",
+      "department": "Department",
+      "city": "City",
+      "address": {
+        "roadType": "Road type (optional: 'Calle', 'Carrera', 'Avenida', 'Avenida carrera', 'Avenida calle', 'Circular', 'Circunvalar', 'Diagonal', 'Manzana', 'Transversal', 'Vía')",
+        "roadName": "Road name (optional). address is optional.",
+        "roadNumber": "Road number (optional)",
+        "roadSubNumber": "Road sub number (optional)",
+        "roadDetails": "Road details (optional. Examples: 'apto', 'casa', 'referencia)"
+      },
+      "email": "Email Address",
+      "plaintiffsAreCreditors": "Optional: boolean indicating if plaintiffs are creditors. If set, plaintiffs must be set and defendant must not be set.",
+      "plaintiffs": "Array of plaintiff names (this means the proceeding is against). If set, cannot set defendant",
+      "defendant": "Defendant name (this means the proceeding is in favor). If set, cannot set plaintiffs",
+      "processStatus": "Optional string",
+      "value": "Amount in COP",
+      "supportFile": {
+        "name": "Support file name (supportFile is optional)",
+        "path": "Optional: Path to support file"
+      }
+    }
+
+  ],
   "childSupportObligations": "TODO: Optional...",
   "availableResources": "TODO: Optional...",
   "debtNegotiation": {
-    "installments": "number of installments as an integer (minimum 1)"
+    "installments": "number of installments as an integer (minimum 1)",
+    "startDate": "ISO date string (yyyy-mm-dd)"
   }
 }

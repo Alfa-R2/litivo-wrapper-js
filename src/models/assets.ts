@@ -2,7 +2,6 @@ import z from 'zod';
 import { JudicialNotificationAddressRequiredSchema } from './base.js';
 import { CountrySchema } from './enums/country.js';
 
-
 const AssetBaseSchema = z.object({
   description: z.string().trim().min(1),
   marca: z.string().trim().min(1),
@@ -29,7 +28,7 @@ const AssetOtrosMueblesSchema = AssetBaseSchema.extend({
     'Semovientes',
     'Muebles y Enseres',
     'Otros',
-  ])
+  ]),
 });
 
 const AssetMuebleSchema = z.union([AssetVehicularSchema, AssetOtrosMueblesSchema]);
@@ -43,7 +42,9 @@ const AssetInmuebleSchema = z.object({
   participationPercentage: z.number().min(0).max(100), // TODO: check if "tarjeta de propiedad" is needed.
 });
 
-const AssetsSchema = z.array(z.union([AssetMuebleSchema, AssetInmuebleSchema]));
+const AssetSchema = z.union([AssetMuebleSchema, AssetInmuebleSchema]);
+
+const AssetsSchema = z.array(AssetSchema);
 
 type AssetVehicularType = z.infer<typeof AssetVehicularSchema>;
 type AssetOtrosMueblesType = z.infer<typeof AssetOtrosMueblesSchema>;
@@ -51,6 +52,17 @@ type AssetMuebleType = z.infer<typeof AssetMuebleSchema>;
 type AssetInmuebleType = z.infer<typeof AssetInmuebleSchema>;
 type AssetsType = z.infer<typeof AssetsSchema>;
 
-export { AssetInmuebleSchema, AssetMuebleSchema, AssetOtrosMueblesSchema, AssetsSchema, AssetVehicularSchema };
-export type { AssetInmuebleType, AssetMuebleType, AssetOtrosMueblesType, AssetsType, AssetVehicularType };
-
+export {
+  AssetInmuebleSchema,
+  AssetMuebleSchema,
+  AssetOtrosMueblesSchema,
+  AssetsSchema,
+  AssetVehicularSchema,
+};
+export type {
+  AssetInmuebleType,
+  AssetMuebleType,
+  AssetOtrosMueblesType,
+  AssetsType,
+  AssetVehicularType,
+};
