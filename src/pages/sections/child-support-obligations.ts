@@ -7,7 +7,9 @@ import type {
 } from '../../models/child-support-obligation.js';
 import BaseSection from '../bases/section.js';
 
-/** TODO: Child Support Obligations (feat: extend create insolvency method with child support obligations section) */
+/** TODO: Child Support Obligations (feat: extend create insolvency method with child support obligations section)
+ * Check that this schema is documented within the example insolvency json file before committing
+ */
 class ChildSupportObligationsSection extends BaseSection<[ChildSupportObligationsType]> {
   private readonly submitButton: Locator;
 

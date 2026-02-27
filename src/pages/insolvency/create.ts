@@ -64,7 +64,6 @@ class CreateInsolvencyPage extends FootedPage {
     }
     const jaoppTitle = 'PROCESOS JUDICIALES, ADMINISTRATIVOS O PRIVADOS';
     if (await page.locator('h2', { hasText: jaoppTitle }).isVisible()) {
-      // TODO: Do it later, it is optional.
       await this.jaoppSection.send(insolvency.jaopp);
     }
 

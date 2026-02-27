@@ -8,7 +8,9 @@ import {
 import BaseSection from '../../bases/section.js';
 import { isAssetMuebleType, isAssetVehicularType } from './helpers.js';
 
-/** TODO: Assets (feat: extend create insolvency method with assets section) */
+/** TODO: Assets (feat: extend create insolvency method with assets section)
+ * Check that this schema is documented within the example insolvency json file before committing
+ */
 class AssetsSection extends BaseSection<[AssetsType]> {
   private readonly submitButton: Locator;
   private readonly mueblesButton: Locator;
