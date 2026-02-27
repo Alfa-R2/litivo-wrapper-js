@@ -1,4 +1,5 @@
 import type { Locator, Page } from 'playwright';
+import { getDateInputSelector } from '../../helpers.js';
 import type { DebtNegotiationType } from '../../models/debt-negotiation.js';
 import BaseSection from '../bases/section.js';
 
@@ -21,6 +22,10 @@ class DebtNegotiationSection extends BaseSection<[DebtNegotiationType]> {
     const installments = debtNegotiation.installments;
     const installmentsInput = page.locator('nz-input-number[formcontrolname="cuotas"] input');
     await installmentsInput.fill(installments.toString());
+
+    
+    const startDateInput = page.locator(getDateInputSelector('fecha'));
+    await startDateInput.fill(debtNegotiation.startDate);
 
     // TODO: Complete form
 

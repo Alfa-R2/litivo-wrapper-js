@@ -81,7 +81,6 @@ class CreateInsolvencyPage extends FootedPage {
     }
 
     if (await page.locator('h2', { hasText: 'DOCUMENTOS ANEXOS' }).isVisible()) {
-      // TODO: Do it later, it is optional.
       await this.attachedDocumentsSection.send(insolvency.attachedDocuments);
     }
 
