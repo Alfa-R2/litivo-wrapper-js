@@ -14,6 +14,8 @@ import DebtNegotiationSection from '../sections/debt-negotiation.js';
 import DebtorSection from '../sections/debtor.js';
 import JAOPPSection from '../sections/judicial-administrative-or-private-proceedings.js';
 import SiteSection from '../sections/site.js';
+import { deleteDraft } from './helpers.js';
+
 
 class CreateInsolvencyPage extends FootedPage {
   protected readonly url: URL = new URL('/insolvencia/crear', wrapperUrl);
@@ -51,36 +53,43 @@ class CreateInsolvencyPage extends FootedPage {
     await this.goto();
 
     await this.siteSection.send(insolvency.site);
-    await this.debtorSection.send(insolvency.debtor);
 
-    if (await page.locator('h2', { hasText: 'CAUSAS' }).isVisible()) {
-      await this.causesSection.send(insolvency.causes);
-    }
-    if (await page.locator('h2', { hasText: 'ACREEDOR' }).isVisible()) {
-      await this.creditorSection.send(insolvency.creditors);
-    }
-    if (await page.locator('h2', { hasText: 'BIENES' }).isVisible()) {
-      await this.assetsSection.send(insolvency.assets);
-    }
-    const jaoppTitle = 'PROCESOS JUDICIALES, ADMINISTRATIVOS O PRIVADOS';
-    if (await page.locator('h2', { hasText: jaoppTitle }).isVisible()) {
-      await this.jaoppSection.send(insolvency.jaopp);
-    }
+    try {
+      await this.debtorSection.send(insolvency.debtor);
 
-    if (await page.locator('h2', { hasText: 'OBLIGACIONES ALIMENTARIAS' }).isVisible()) {
-      await this.childSupportObligationsSection.send(insolvency.childSupportObligations);
-    }
+      if (await page.locator('h2', { hasText: 'CAUSAS' }).isVisible()) {
+        await this.causesSection.send(insolvency.causes);
+      }
+      if (await page.locator('h2', { hasText: 'ACREEDOR' }).isVisible()) {
+        await this.creditorSection.send(insolvency.creditors);
+      }
+      if (await page.locator('h2', { hasText: 'BIENES' }).isVisible()) {
+        await this.assetsSection.send(insolvency.assets);
+      }
+      const jaoppTitle = 'PROCESOS JUDICIALES, ADMINISTRATIVOS O PRIVADOS';
+      if (await page.locator('h2', { hasText: jaoppTitle }).isVisible()) {
+        await this.jaoppSection.send(insolvency.jaopp);
+      }
 
-    if (await page.locator('h2', { hasText: 'RECURSOS DISPONIBLES' }).isVisible()) {
-      await this.availableResourcesSection.send(insolvency.availableResources);
-    }
+      if (await page.locator('h2', { hasText: 'OBLIGACIONES ALIMENTARIAS' }).isVisible()) {
+        await this.childSupportObligationsSection.send(insolvency.childSupportObligations);
+      }
 
-    if (await page.locator('h2', { hasText: 'NEGOCIACIÓN DE DEUDAS' }).isVisible()) {
-      await this.debtNegotiationSection.send(insolvency.debtNegotiations);
-    }
+      if (await page.locator('h2', { hasText: 'RECURSOS DISPONIBLES' }).isVisible()) {
+        await this.availableResourcesSection.send(insolvency.availableResources);
+      }
 
-    if (await page.locator('h2', { hasText: 'DOCUMENTOS ANEXOS' }).isVisible()) {
-      await this.attachedDocumentsSection.send(insolvency.attachedDocuments);
+      if (await page.locator('h2', { hasText: 'NEGOCIACIÓN DE DEUDAS' }).isVisible()) {
+        await this.debtNegotiationSection.send(insolvency.debtNegotiations);
+      }
+
+      if (await page.locator('h2', { hasText: 'DOCUMENTOS ANEXOS' }).isVisible()) {
+        await this.attachedDocumentsSection.send(insolvency.attachedDocuments);
+      }
+    } catch (error) {
+      await deleteDraft(page);
+      console.log('Error creating insolvency draft, draft deleted if it was created:', error);
+      return;
     }
 
     try {
