@@ -3,6 +3,7 @@ import { wrapperUrl } from '../../constants.js';
 import type { InsolvencyType } from '../../models/insolvency.js';
 import FootedPage from '../bases/footed.js';
 // Sections
+import { MoreThanOneDraftWithTheSameDebtorException } from '../../exceptions.js';
 import ApplicationSubmissionSection from '../sections/application-submission.js';
 import AssetsSection from '../sections/assets/assets.js';
 import AttachedDocumentsSection from '../sections/attached-documents.js';
@@ -14,7 +15,7 @@ import DebtNegotiationSection from '../sections/debt-negotiation.js';
 import DebtorSection from '../sections/debtor.js';
 import JAOPPSection from '../sections/judicial-administrative-or-private-proceedings.js';
 import SiteSection from '../sections/site.js';
-import { deleteDraft } from './helpers.js';
+import { deleteDraft, validateDraftHasOneDebtor } from './helpers.js';
 
 
 class CreateInsolvencyPage extends FootedPage {
@@ -52,9 +53,15 @@ class CreateInsolvencyPage extends FootedPage {
     const page = this.page;
     await this.goto();
 
-    await this.siteSection.send(insolvency.site);
-
     try {
+      await validateDraftHasOneDebtor(page, [
+        insolvency.debtor.identificationData.firstName,
+        insolvency.debtor.identificationData?.middleName,
+        insolvency.debtor.identificationData.lastName,
+        insolvency.debtor.identificationData?.secondLastName,
+      ].filter(Boolean).join(' '));
+
+      await this.siteSection.send(insolvency.site);
       await this.debtorSection.send(insolvency.debtor);
 
       if (await page.locator('h2', { hasText: 'CAUSAS' }).isVisible()) {
@@ -87,6 +94,11 @@ class CreateInsolvencyPage extends FootedPage {
         await this.attachedDocumentsSection.send(insolvency.attachedDocuments);
       }
     } catch (error) {
+
+      if (error instanceof MoreThanOneDraftWithTheSameDebtorException) {
+        throw error;
+      }
+
       await deleteDraft(page);
       console.log('Error creating insolvency draft, draft deleted if it was created:', error);
       return;

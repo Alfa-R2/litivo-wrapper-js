@@ -1,9 +1,10 @@
 import type { Locator, Page } from "playwright";
 import { expect } from "playwright/test";
-import { wrapperUrl } from "../../constants.js";
+import { listarInsolvenciesUrl } from "../../constants.js";
+import { DraftDeletionException, MoreThanOneDraftWithTheSameDebtorException } from "../../exceptions.js";
 import { getInputSelector } from "../../helpers.js";
-const BASE_DRAFT_URL = 'https://www.litivo.com/insolvencia/crear/';
-const DRAFT_URL_PATTERN = new RegExp(`^${BASE_DRAFT_URL.replace(/\//g, '\\/')}\\d+$`);
+
+
 
 function getOptionDiv(page: Page, title: string): Locator {
     return page.locator(`nz-option-item[title="${title}"]`);
@@ -23,6 +24,25 @@ async function fillInput(page: Page, nzSelect: Locator, value: string): Promise<
     const optionDiv: Locator = getOptionDiv(page, value);
     await optionDiv.click();
     await page.waitForTimeout(500); // TODO: find a better way to wait for the input to be filled.
+}
+
+async function searchDraft(page:Page, by:"Código de Insolvencia"|"Nombre del Deudor"|"Identificación del Deudor", value:string):Promise<Locator> {
+    await page.goto(listarInsolvenciesUrl.href  );
+    await page.waitForURL(listarInsolvenciesUrl.href);
+
+    const solicitudStateInput = page.locator(getInputSelector('estado_busqueda'));
+    const searchFilterInput = page.locator(getInputSelector('filtrobusqueda'));
+    const searchInput = page.locator('input[formcontrolname="search"]');
+    const searchButton = page.locator('i[nztype="search"]');
+    const rows = page.locator("tbody tr.ant-table-row")
+
+    await fillInput(page, solicitudStateInput, 'BORRADORES');
+    await fillInput(page, searchFilterInput, by);
+    await searchInput.fill(value);
+    await searchButton.click();
+    await page.waitForURL(listarInsolvenciesUrl.href);
+
+    return rows;
 }
 
 async function deleteDraft(page: Page): Promise<void> {
@@ -51,24 +71,11 @@ async function deleteDraft(page: Page): Promise<void> {
 
     console.log(`Draft ${code} loaded`);
 
-    const insolvencias_listar = new URL('/insolvencia/listar', wrapperUrl).href;
-    await page.goto(insolvencias_listar);
-    await page.waitForURL(insolvencias_listar);
-
-    const solicitudStateInput = page.locator(getInputSelector('estado_busqueda'));
-    const searchFilterInput = page.locator(getInputSelector('filtrobusqueda'));
-    const searchInput = page.locator('input[formcontrolname="search"]');
-    const searchButton = page.locator('i[nztype="search"]');
-    const rows = page.locator("tbody tr.ant-table-row")
-
-    await fillInput(page, solicitudStateInput, 'BORRADORES');
-    await fillInput(page, searchFilterInput, "Código de Insolvencia");
-    await searchInput.fill(code);
-    await searchButton.click();
+    let rows = await searchDraft(page, "Código de Insolvencia", code);
     try {
         await expect(rows).toHaveCount(1, { timeout: 10_000 });
     } catch (e) {
-        throw new Error(`Failed to find 1 row in the table: ${e}`);
+        throw new DraftDeletionException(`Failed to find 1 row in the table: ${e}`);
     }
 
     const lastRow = rows.last()
@@ -77,7 +84,7 @@ async function deleteDraft(page: Page): Promise<void> {
     const deleteButton = page.locator('button', { hasText: 'Eliminar' });
 
     if (await idCell.textContent() !== code) {
-        throw new Error(`Failed to find the draft with code ${code}`);
+        throw new DraftDeletionException(`Failed to find the draft with code ${code}`);
     }
 
     await trashButton.click();
@@ -86,10 +93,19 @@ async function deleteDraft(page: Page): Promise<void> {
         state: 'detached',
         timeout: 10_000,
     })
-    await searchButton.click();
-    await page.waitForURL(insolvencias_listar);
+
+    rows = await searchDraft(page, "Código de Insolvencia", code);
     await expect(rows).toHaveCount(0, { timeout: 10_000 });
 }
+async function validateDraftHasOneDebtor(page: Page, fullName: string): Promise<void> {
+    const rows = await searchDraft(page, "Nombre del Deudor", fullName);
 
-export { deleteDraft };
+    try {
+        await expect(rows).toHaveCount(0, { timeout: 10_000 });
+    } catch (e) {
+        throw new MoreThanOneDraftWithTheSameDebtorException(`Exists more than one draft with this debtor ${fullName}, rows count: ${await rows.count()}`);
+    }
+}
+
+export { deleteDraft, validateDraftHasOneDebtor };
 
