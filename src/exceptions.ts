@@ -25,5 +25,11 @@ class MoreThanOneDraftWithTheSameDebtorException extends LitivoException {
     }
 }
 
-export { DraftCreationException, DraftDeletionException, LitivoException, MoreThanOneDraftWithTheSameDebtorException };
+class DebtorAlreadyHasProcessException extends LitivoException {
+    constructor(message: string) {
+        super(message);
+        this.name = "DebtorAlreadyHasProcessException";
+    }
+}
+export { DebtorAlreadyHasProcessException, DraftCreationException, DraftDeletionException, LitivoException, MoreThanOneDraftWithTheSameDebtorException };
 

@@ -3,7 +3,6 @@ import { wrapperUrl } from '../../constants.js';
 import type { InsolvencyType } from '../../models/insolvency.js';
 import FootedPage from '../bases/footed.js';
 // Sections
-import { MoreThanOneDraftWithTheSameDebtorException } from '../../exceptions.js';
 import ApplicationSubmissionSection from '../sections/application-submission.js';
 import AssetsSection from '../sections/assets/assets.js';
 import AttachedDocumentsSection from '../sections/attached-documents.js';
@@ -15,7 +14,6 @@ import DebtNegotiationSection from '../sections/debt-negotiation.js';
 import DebtorSection from '../sections/debtor.js';
 import JAOPPSection from '../sections/judicial-administrative-or-private-proceedings.js';
 import SiteSection from '../sections/site.js';
-import { deleteDraft, validateDraftHasOneDebtor } from './helpers.js';
 
 
 class CreateInsolvencyPage extends FootedPage {
@@ -53,56 +51,39 @@ class CreateInsolvencyPage extends FootedPage {
     const page = this.page;
     await this.goto();
 
-    try {
-      await validateDraftHasOneDebtor(page, [
-        insolvency.debtor.identificationData.firstName,
-        insolvency.debtor.identificationData?.middleName,
-        insolvency.debtor.identificationData.lastName,
-        insolvency.debtor.identificationData?.secondLastName,
-      ].filter(Boolean).join(' '));
+    await this.siteSection.send(insolvency.site);
+    await this.debtorSection.send(insolvency.debtor);
 
-      await this.siteSection.send(insolvency.site);
-      await this.debtorSection.send(insolvency.debtor);
-
-      if (await page.locator('h2', { hasText: 'CAUSAS' }).isVisible()) {
-        await this.causesSection.send(insolvency.causes);
-      }
-      if (await page.locator('h2', { hasText: 'ACREEDOR' }).isVisible()) {
-        await this.creditorSection.send(insolvency.creditors);
-      }
-      if (await page.locator('h2', { hasText: 'BIENES' }).isVisible()) {
-        await this.assetsSection.send(insolvency.assets);
-      }
-      const jaoppTitle = 'PROCESOS JUDICIALES, ADMINISTRATIVOS O PRIVADOS';
-      if (await page.locator('h2', { hasText: jaoppTitle }).isVisible()) {
-        await this.jaoppSection.send(insolvency.jaopp);
-      }
-
-      if (await page.locator('h2', { hasText: 'OBLIGACIONES ALIMENTARIAS' }).isVisible()) {
-        await this.childSupportObligationsSection.send(insolvency.childSupportObligations);
-      }
-
-      if (await page.locator('h2', { hasText: 'RECURSOS DISPONIBLES' }).isVisible()) {
-        await this.availableResourcesSection.send(insolvency.availableResources);
-      }
-
-      if (await page.locator('h2', { hasText: 'NEGOCIACIÓN DE DEUDAS' }).isVisible()) {
-        await this.debtNegotiationSection.send(insolvency.debtNegotiations);
-      }
-
-      if (await page.locator('h2', { hasText: 'DOCUMENTOS ANEXOS' }).isVisible()) {
-        await this.attachedDocumentsSection.send(insolvency.attachedDocuments);
-      }
-    } catch (error) {
-
-      if (error instanceof MoreThanOneDraftWithTheSameDebtorException) {
-        throw error;
-      }
-
-      await deleteDraft(page);
-      console.log('Error creating insolvency draft, draft deleted if it was created:', error);
-      return;
+    if (await page.locator('h2', { hasText: 'CAUSAS' }).isVisible()) {
+      await this.causesSection.send(insolvency.causes);
     }
+    if (await page.locator('h2', { hasText: 'ACREEDOR' }).isVisible()) {
+      await this.creditorSection.send(insolvency.creditors);
+    }
+    if (await page.locator('h2', { hasText: 'BIENES' }).isVisible()) {
+      await this.assetsSection.send(insolvency.assets);
+    }
+    const jaoppTitle = 'PROCESOS JUDICIALES, ADMINISTRATIVOS O PRIVADOS';
+    if (await page.locator('h2', { hasText: jaoppTitle }).isVisible()) {
+      await this.jaoppSection.send(insolvency.jaopp);
+    }
+
+    if (await page.locator('h2', { hasText: 'OBLIGACIONES ALIMENTARIAS' }).isVisible()) {
+      await this.childSupportObligationsSection.send(insolvency.childSupportObligations);
+    }
+
+    if (await page.locator('h2', { hasText: 'RECURSOS DISPONIBLES' }).isVisible()) {
+      await this.availableResourcesSection.send(insolvency.availableResources);
+    }
+
+    if (await page.locator('h2', { hasText: 'NEGOCIACIÓN DE DEUDAS' }).isVisible()) {
+      await this.debtNegotiationSection.send(insolvency.debtNegotiations);
+    }
+
+    if (await page.locator('h2', { hasText: 'DOCUMENTOS ANEXOS' }).isVisible()) {
+      await this.attachedDocumentsSection.send(insolvency.attachedDocuments);
+    }
+
 
     try {
       // NOTE: Not automated because it requires a legal representative signature.
